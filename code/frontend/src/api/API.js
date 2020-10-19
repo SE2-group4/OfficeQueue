@@ -2,6 +2,8 @@ import Service from './service.js';
 import Ticket from './ticket.js';
 const baseurl='/api';
 
+/*---------TEST VERSION--------------*/
+
 //getServices : versione test
 async function getServicesT(){
     return [{serviceID:'s1',serviceName:'servizio1',serviceTime:'10'},
@@ -9,6 +11,14 @@ async function getServicesT(){
     {serviceID:'s3',serviceName:'servizio3',serviceTime:'20'}];
 }
 
+async function getCountersT(){
+    return [{counterId : "c1"},{counterId : "c2"}];
+}
+
+async function getServicesCountersT(){
+    return [{counterId : "c1",serviceID : "s2"},{counterId : "c2",serviceID: "s1"}];
+}
+/*------------------------------------*/
 //GET /api/services -> Service[]
 async function getServices(){
     return new Promise((resolve,reject) => {
@@ -57,5 +67,5 @@ async function getTicket(serviceID){
     
 }
 
-const API={getServices,getServicesT,getTicket,getTicketT};
+const API={getServices,getServicesT,getTicket,getTicketT,getCountersT,getServicesCountersT};
 export default API;
