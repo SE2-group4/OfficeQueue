@@ -3,7 +3,9 @@
 const express = require("express");
 const dao = require("./dao.js"); 
 const Mutex = require('async-mutex').Mutex;
+const morgan = require('morgan');
 const { body, validationResult } = require('express-validator');
+
 
 const Service = require('./service.js')
 const Ticket = require('./ticket.js')
@@ -16,6 +18,7 @@ let availableServices = null;
 const lastTicketIdMutex = new Mutex();
 
 app.use(express.json())
+app.use(morgan("combined"))
 
 const APIRoutes= {
     routes: [
@@ -65,10 +68,9 @@ function createErrorMsg(from, msg) {
     return err
 }
 
-
 app.get('/api/tickets/:serviceId', async (req, res) => {
-    serviceId = parseInt(req.params.serviceId, 10)
-    isServiceFound = availableServices.find(service => service.serviceId === serviceId);
+    const serviceId = parseInt(req.params.serviceId, 10)
+    const isServiceFound = availableServices.find(service => service.serviceId === serviceId);
     if (isServiceFound === undefined) {
         errorMsg = createErrorMsg("server GET /api/tickets/:serviceId", `The service requested (${serviceId}) does not exists`);
         res.status(400).json(errorMsg)
@@ -76,8 +78,8 @@ app.get('/api/tickets/:serviceId', async (req, res) => {
 
     const release = await lastTicketIdMutex.acquire();
     try {
-        newTicket = new Ticket(lastTicketId + 1, new Date(), serviceId, null);
-        result = await dao.addTicket(newTicket)
+        const newTicket = new Ticket(lastTicketId + 1, new Date(), serviceId, null);
+        const result = await dao.addTicket(newTicket)
         lastTicketId += 1
         res.json(newTicket)
     } 
@@ -93,7 +95,7 @@ app.get('/api/tickets/:serviceId', async (req, res) => {
 
 app.get('/api/services', (req, res) => {
     dao.getServices()
-        .then(services => res.json(services))
+        .then(services => res.status(200).json(services))
         .catch(err => {
             console.log(err, "GET /api/services");
             res.status(503).json(ErrorMsgDb)
@@ -249,7 +251,7 @@ app.get('/test', async (req, res) => {
 });
 
 app.all('*', (req, res) => {
-    res.status(401).send("ACCESS DENIED, visit /api")
+    res.status(403).send("ACCESS DENIED, visit /api")
 });
 
 const init = async () => {
