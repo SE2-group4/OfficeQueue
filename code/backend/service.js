@@ -12,7 +12,7 @@ class Service {
         this.serviceTime = serviceTime;
     }
 
-    fromRow(row) {
+    static fromRow(row) {
         const serviceId = row.serviceId;
         const serviceName = row.serviceName;
         const serviceTime = row.serviceTime;
@@ -20,4 +20,4 @@ class Service {
     }
 }
 
-exports.Service = Service;
+module.exports = Service

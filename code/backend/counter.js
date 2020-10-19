@@ -8,11 +8,11 @@
 class Counter {
     /**
      * constructor
-     * @param {int} conterId 
+     * @param {int} counterId 
      */
-    constructor(conterId = -1) {
-        this.conterId = conterId;
+    constructor(counterId = -1) {
+        this.counterId = counterId;
     }
 }
 
-module.export = Counter;
+module.exports = Counter;

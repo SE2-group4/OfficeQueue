@@ -18,10 +18,20 @@ class Ticket {
      */
     constructor(ticketId = -1, date, serviceId, estimatedTime) {
         this.ticketId = ticketId;
-        this.date = moment(date);
+        this.date = date;
         this.serviceId = serviceId;
         this.estimatedTime = estimatedTime;
+
     }
+
+    static fromRow(row) {
+        const ticketId = row.ticketId;
+        const date = row.date;
+        const serviceId = row.serviceId;
+        const estimatedTime = row.estimatedTime;
+        return new Ticket(ticketId, date, serviceId, estimatedTime);
+    }
+
 }
 
-module.export = Ticket;
+module.exports = Ticket
