@@ -1,13 +1,15 @@
 /**
- * functions to prepare a testing DB
+ * prepare a testing DB
+ * read queries from the <sql_file> and run them against the testing DB
  * 
  * @author Gastaldi Paolo
 */
 
 'use strict';
 
+const sql_file = './testing.db';
 const sqlite = require('sqlite3');
-const db = new sqlite.Database('./testing.db', (err) => {
+const db = new sqlite.Database(sql_file, (err) => {
     if(err) 
         console.log("Error creating DB connection!");
 });
@@ -26,9 +28,13 @@ db.serialize(() => {
     db.run('BEGIN TRANSACTION;');
     // Loop through the `dataArr` and db.run each query
     dataArr.forEach((query) => {
+        count++;
         if(query) {
             db.run(query, (err) => {
-                if(err) throw err;
+                if(err) {
+                    console.error(`> Error in line ${count}`);
+                    console.error(err);
+                }
             });
         }
     });
