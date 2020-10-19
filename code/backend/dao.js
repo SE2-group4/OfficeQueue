@@ -7,7 +7,7 @@
 
 'use strict';
 
-const sqlite = require('sqlite');
+const sqlite = require('sqlite3');
 const db = new sqlite.Database('office_queue.db', (err) => {
     if (err) throw err;
 });
@@ -87,7 +87,7 @@ exports.addService = function (service) {
 exports.updateService = function (service) {
     return new Promise((resolve, reject) => {
         const sql = "UPDATE Service SET serviceName = ?, serviceTime = ? WHERE serviceId = ?";
-        db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], (err) => {
+        db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], function(err) {
             if(err) {
                 reject(err);
                 return;
@@ -106,7 +106,7 @@ exports.updateService = function (service) {
 exports.deleteService = function (service) {
     return new Promise((resolve, reject) => {
         const sql = "DELETE FROM Service WHERE serviceId = ?";
-        db.run(sql, [service.serviceId], (err) => {
+        db.run(sql, [service.serviceId], function(err) {
             if(err) {
                 reject(err);
                 return;
@@ -178,24 +178,23 @@ exports.deleteCounterService = function (counter, service) {
 /**
  * get the highest ticket ID given a certain date
  * @param {Date} date
- * @returns {Ticket} ticket
+ * @returns {int} ticketId 
  */
 exports.getLastTicketIdByDay = function (date) {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT MAX(ticketId) FROM Ticket WHERE date = DATE(?)";
+        const sql = "SELECT MAX(ticketId) FROM Ticket WHERE date(date) = date(?)";
         db.get(sql, [date.toISOString()], (err, rows) => {
             if(err) {
                 reject(err);
                 return;
             }
 
-            if(rows.length != 1) {
+            if(rows['MAX(ticketId)'] === null) {
                 reject({ error: "no tickets" });
                 return;
             }
 
-            const ticket = new Ticket(rows[0]);
-            resolve(ticket);
+            resolve(rows['MAX(ticketId)']);
         });
     });
 }
