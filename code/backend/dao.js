@@ -7,7 +7,7 @@
 'use strict';
 
 const sqlite = require('sqlite3');
-const db = new sqlite.Database('office_queue.sqlite', (err) => {
+const db = new sqlite.Database('office_queue.db', (err) => {
     if (err) throw err;
 });
 
@@ -21,14 +21,31 @@ exports.getServices = function () {
         db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err);
-                console.log(err);
             }
             else {
                 const services = [];
                 rows.forEach(row => {
-                    services.push(createService(row));
+                    services.push(Service.fromRow(row));
                 });
                 resolve(services);
+            }
+        });
+    });
+}
+
+exports.getTickets = function () {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM Ticket"
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                const tickets = [];
+                rows.forEach(row => {
+                    tickets.push(Ticket.fromRow(row));
+                });
+                resolve(tickets);
             }
         });
     });
@@ -59,7 +76,7 @@ exports.addService = function (service) {
  */
 exports.updateService = function (service) {
     return new Promise((reject, resolve) => {
-        const sql = "UPDATE Service SET serviceName = ?, serviceTime = ? WHERE serviceId = ?";
+        const sql = "UPDATE Service SET serviceName = ? serviceTime = ? WHERE serviceId = ?";
         db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], (err) => {
             if(err) {
                 reject(err);
@@ -77,7 +94,7 @@ exports.updateService = function (service) {
  */
 exports.deleteService = function (service) {
     return new Promise((reject, resolve) => {
-        const sql = "DELETE Service WHERE serviceId = ?";
+        const sql = "DELETE FROM Service WHERE serviceId = ?";
         db.run(sql, [service.serviceId], (err) => {
             if(err) {
                 reject(err);
@@ -95,14 +112,14 @@ exports.deleteService = function (service) {
  */
 exports.addTicket = function (ticket) {
     return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO Ticket(ticketId, date, serviceId, estimatedTime) VALUES (?, DATE(?), ?, ?)";
+        const sql = "INSERT INTO Ticket(ticketId, date, serviceId, estimatedTime) VALUES (?, ?, ?, ?)";
         db.run(sql, [ticket.ticketId, ticket.date.toISOString(), ticket.serviceId, ticket.estimatedTime], function(err) {
             if(err) {
                 reject(err);
                 return;
             }
 
-            resolve(this.lastID);
+            resolve(this.lastId);
         });
     });
 }
@@ -114,7 +131,7 @@ exports.addTicket = function (ticket) {
  */
 exports.addCounterService = function (counter, service) {
     return new Promise((resolve, reject) => {
-        const sql = "INSERTO INTO CounterService(counterId, serviceId) VALUES (?, ?)";
+        const sql = "INSERT INTO CounterService(counterId, serviceId) VALUES (?, ?)";
         db.run(sql, [counter.counterId, service.serviceId], function(err) {
             if(err) {
                 reject(err);
@@ -133,7 +150,7 @@ exports.addCounterService = function (counter, service) {
  */
 exports.deleteCounterService = function (counter, service) {
     return new Promise((resolve, reject) => {
-        const sql = "DELETE CounterService WHERE counterId = ? AND serviceId = ?";
+        const sql = "DELETE FROM CounterService WHERE counterId = ? AND serviceId = ?";
         db.run(sql, [counter.counterId, service.serviceId], function(err) {
             if(err) {
                 reject(err);
@@ -166,6 +183,24 @@ exports.getLastTicketIdByDay = function (date) {
 
             const ticket = new Ticket(rows[0]);
             resolve(ticket);
+        });
+    });
+}
+
+exports.getCounterServices = function () {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM CounterService"
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                const res = [];
+                rows.forEach(row => {
+                    res.push(row);
+                });
+                resolve(res);
+            }
         });
     });
 }
