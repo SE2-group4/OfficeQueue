@@ -4,11 +4,12 @@ const baseurl='/api';
 
 /*---------TEST VERSION--------------*/
 
+ let services= [{serviceID:'s1',serviceName:'servizio1',serviceTime:'10'},
+                {serviceID:'s2',serviceName:'servizio2',serviceTime:'15'},
+                {serviceID:'s3',serviceName:'servizio3',serviceTime:'20'}]
 //getServices : versione test
 async function getServicesT(){
-    return [{serviceID:'s1',serviceName:'servizio1',serviceTime:'10'},
-    {serviceID:'s2',serviceName:'servizio2',serviceTime:'15'},
-    {serviceID:'s3',serviceName:'servizio3',serviceTime:'20'}];
+    return services;
 }
 
 async function getCountersT(){
@@ -17,6 +18,30 @@ async function getCountersT(){
 
 async function getServicesCountersT(){
     return [{counterId : "c1",serviceID : "s2"},{counterId : "c2",serviceID: "s1"}];
+}
+async function editServiceT(id,name,time){
+    /*let service = services.filter((s)=>s.serviceID===id);
+    service[0].serviceName=name;
+    service[0].serviceTime=time;
+    console.log(service[0]);
+    services.splice(1,0,service[0]);*/
+    for (let i=0;i<services.length;i++)
+        if(services[i].serviceID===id){
+            services[i].serviceName=name;
+            services[i].serviceTime=time;
+        }
+}
+async function removeServiceT(id){
+    let c=0;
+    for (let s of services){
+        if(s.serviceID===id)
+            services.splice(c,1);
+        c++;
+    }
+
+}
+async function addServiceT(name,time){
+    services.splice(services.length,1,new Service(services.length,name,time));
 }
 /*------------------------------------*/
 //GET /api/services -> Service[]
@@ -67,5 +92,5 @@ async function getTicket(serviceID){
     
 }
 
-const API={getServices,getServicesT,getTicket,getTicketT,getCountersT,getServicesCountersT};
+const API={getServices,getServicesT,getTicket,getTicketT,getCountersT,getServicesCountersT,editServiceT,removeServiceT,addServiceT};
 export default API;

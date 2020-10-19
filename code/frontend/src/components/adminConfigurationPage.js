@@ -5,12 +5,24 @@ import Jumbotron from 'react-bootstrap/Jumbotron';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import Table from "react-bootstrap/Table"
+import Table from "react-bootstrap/Table";
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+
+const trash = <svg className="bi bi-trash" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+            </svg>
+
+const edit=<svg className="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 00.5.5H4v.5a.5.5 0 00.5.5H5v.5a.5.5 0 00.5.5H6v-1.5a.5.5 0 00-.5-.5H5v-.5a.5.5 0 00-.5-.5H3z" clipRule="evenodd"/>
+                </svg>
 
 class AdminConfigurationPage extends React.Component {
     constructor(props){
         super(props);
-        this.state={mode : ""};
+        this.state={mode : "", show : false};
     }
     setServicesView=()=>{
         this.setState({mode : "services"});
@@ -21,9 +33,35 @@ class AdminConfigurationPage extends React.Component {
     setServicesCountersView=()=>{
         this.setState({mode : "servicesCounters"});
     }
+    modifyService=(service)=>{
+        this.setState({show : true, modifyService : service});
+    }
+    addService = ()=>{
+        this.setState({show : true});
+    }
+    removeService=(service)=>{
+        this.props.removeService(service.serviceID);
+    }
+    handleClose = ()=>{
+        this.setState({show : false, modifyService : null});
+    }
+    editSubmit = (name,time)=>{
+        this.props.editService(this.state.modifyService.serviceID,name,time);
+        this.handleClose();
+    }
+    addSubmit = (name,time) =>{
+        this.props.addService(name,time);
+        this.handleClose();
+    }
     render(){
-        console.log(this.props.services);
         return( 
+            <>
+            {this.state.show && this.state.modifyService &&
+            <EditModal service={this.state.modifyService} handleClose={this.handleClose} handleSubmit={this.editSubmit}/>
+            }
+            {this.state.show && !this.state.modifyService &&
+            <EditModal handleClose={this.handleClose} handleSubmit={this.addSubmit}/>
+            }
         <Container fluid>
             <Jumbotron>
                 <Row>
@@ -36,7 +74,7 @@ class AdminConfigurationPage extends React.Component {
                     </Col>
                     <Col sm='8'>
                         {this.state.mode=="services" &&
-                        <Content services={this.props.services}></Content>
+                        <Content services={this.props.services} edit={this.modifyService} remove={this.removeService} add={this.addService}></Content>
                         }
                         {this.state.mode =="counters" &&
                         <Content counters={this.props.counters}></Content>
@@ -46,9 +84,8 @@ class AdminConfigurationPage extends React.Component {
                         }
                     </Col>
                 </Row>
-
         </Container>
-
+            </>
         )}
  }
 
@@ -68,6 +105,7 @@ class AdminConfigurationPage extends React.Component {
  function Content(props){
      if (props.services)
         return (
+            <>
             <Table>
                 <thead>
                     <tr>
@@ -77,9 +115,11 @@ class AdminConfigurationPage extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.services.map((service) => <ContentItem key={service.serviceID} service={service} />)}
+                    {props.services.map((service) => <ContentItem key={service.serviceID} service={service} edit={props.edit} remove={props.remove}/>)}
                 </tbody>
             </Table>
+            <Button onClick={()=>props.add()}>Add a service!</Button>
+            </>
      );
      if(props.counters)
         return(
@@ -116,6 +156,8 @@ class AdminConfigurationPage extends React.Component {
             <td>{props.service.serviceID}</td>
             <td>{props.service.serviceName}</td>
             <td>{props.service.serviceTime}</td>
+            <td><Button onClick={()=>props.remove(props.service)}>{trash}</Button></td>
+            <td><Button onClick={()=>props.edit(props.service)}>{edit}</Button></td>
         </tr>        
      )
      if(props.counter)
@@ -132,4 +174,51 @@ class AdminConfigurationPage extends React.Component {
         </tr>     
      );
  }
+ class EditModal extends React.Component{
+     constructor(props){
+         super(props);
+         if(props.service)
+            this.state={serviceName : props.service.serviceName, serviceTime : props.service.serviceTime}
+        else this.state={serviceName : "", serviceTime: ""};
+     }
+     updateField = (name, value) => {
+        this.setState({[name]: value});
+    }
+    onSubmit = (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (!form.checkValidity()) {
+        form.reportValidity();
+        } else {
+            this.props.handleSubmit(this.state.serviceName,this.state.serviceTime);
+        }
+    }
+     render(){
+         return (
+             <Modal show={true} onHide={this.props.handleClose} >
+                 <Modal.Header closeButton>
+                     <Modal.Title>Edit Service</Modal.Title>
+                 </Modal.Header>
+
+                 <Modal.Body>
+                     <Form onSubmit={(event)=>this.onSubmit(event)}>
+                         <Form.Group>
+                             <Form.Label>Service Name :</Form.Label>
+                             <Form.Control type="text" name="serviceName" value={this.state.serviceName} required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} />
+                         </Form.Group>
+                         <Form.Group>
+                             <Form.Label>Estimated Time :</Form.Label>
+                             <Form.Control type="text" name="serviceTime" value={this.state.serviceTime} required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} />
+                         </Form.Group>
+                         <Button variant="secondary" onClick={() => this.props.handleClose()}>Close</Button>
+                         <Button variant="primary" type="submit">Save changes</Button>
+                     </Form>
+                 </Modal.Body>
+
+
+             </Modal>
+         );
+     }
+ }
+
  export default AdminConfigurationPage;

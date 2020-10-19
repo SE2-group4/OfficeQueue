@@ -63,12 +63,38 @@ class App extends React.Component{
   handleErrors(errorObj){
     //to_do
   }
-
+  editService = (id,name,time) =>{
+    API.editServiceT(id,name,time)
+    .then(this.loadServices())
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+      }
+    )
+  }
+  removeService = (id) =>{
+    API.removeServiceT(id)
+    .then(this.loadServices())
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+      })
+  }
+  addService = (name,time) =>{
+    API.addServiceT(name,time)
+    .then(this.loadServices())
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+  
+      }
+      )
+  }
   render(){
     return <Router>
       <Switch>
       <Route path="/admin" render={()=>{
-          return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters}/>}
+          return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters} addService={this.addService} removeService={this.removeService} editService={this.editService}/>}
         }>
         </Route>
         <Route path='/' render={(props) => {
