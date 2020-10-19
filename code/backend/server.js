@@ -1,3 +1,5 @@
+'use strict'
+
 const express = require("express");
 const dao = require("./dao.js"); 
 const Mutex = require('async-mutex').Mutex;
@@ -50,13 +52,13 @@ const APIRoutes= {
 
 const ErrorMsgDb = {
     errors: [{
-        "param": "server",
+        "from": "server",
         "msg": "database promise rej"
     }]
 }
 
 function createErrorMsg(from, msg) {
-    err = {
+    const err = {
         "from" : from,
         "msg" : msg
     }
@@ -93,52 +95,69 @@ app.get('/api/services', (req, res) => {
     dao.getServices()
         .then(services => res.json(services))
         .catch(err => {
-            console.log(ErrorMsgDb, "GET /api/services");
+            console.log(err, "GET /api/services");
             res.status(503).json(ErrorMsgDb)
         });
 });
 
 app.post('/api/services', (req, res) => {
-    nServiceName = req.body.serviceName.toLowerCase();
-    console.log(req.body.serviceName.toLowerCase())
-    isServiceFound = availableServices.find(service => service.serviceName.toLowerCase() === nServiceName);
+
+    const nServiceName = req.body.serviceName;
+    const nServiceTime = req.body.serviceTime;
+
+    if(nServiceName === undefined || nServiceTime === undefined) {
+        const errMsg = createErrorMsg("Server POST /api/services", `One or more field are undefined: serviceName = ${nServiceName}, serviceTime = ${nServiceTime}`);
+        res.status(400).json(errMsg);
+        return;
+    }
+
+    const isServiceFound = availableServices.find(service => service.serviceName.toLowerCase() === nServiceName.toLowerCase());
 
     if (!isServiceFound) {
-        newService = new Service(null, nServiceName, parseInt(req.body.serviceTime))
+        const newService = new Service(null, nServiceName.toLowerCase(), parseInt(nServiceTime))
         dao.addService(newService)
-            .then(service => {
-                availableServices.push(service)
-                res.status(201).json(service)
+            .then(serviceId => {
+                newService.serviceId = serviceId 
+                availableServices.push(newService)
+                res.status(201).json(newService)
             })
             .catch(err => {
-                console.log(ErrorMsgDb, "POST /api/services");
+                console.log(err, "POST /api/services");
                 res.status(503).json(ErrorMsgDb)
             });
     } else {
-        err = createErrorMsg("Server POST /api/services", `A service with this name already exists: ${nServiceName}`)
+        const err = createErrorMsg("Server POST /api/services", `A service with this name already exists: ${nServiceName}`)
         res.status(400).json(err)
     }
 });
 
 app.put('/api/services/:serviceId', (req, res) => {
-    nServiceId = parseInt(req.params.serviceId)
-    isServiceFound = availableServices.find(service => service.serviceId === nServiceId);
+    const nServiceName = req.body.serviceName;
+    const nServiceTime = req.body.serviceTime;
+    const nServiceId = parseInt(req.params.serviceId)
+
+    if(nServiceName === undefined || nServiceTime === undefined) {
+        const errMsg = createErrorMsg(`Server PUT /api/services/${nServiceId}`, `One or more field are undefined: serviceName = ${nServiceName}, serviceTime = ${nServiceTime}`);
+        res.status(400).json(errMsg)
+        return;
+    }
+
+    const isServiceFound = availableServices.find(service => service.serviceId === nServiceId);
 
     if (isServiceFound != undefined) {
-        updatedService = new Service(nServiceId, req.body.serviceName, parseInt(req.body.serviceTime))
-        console.log(updatedService)
+        const updatedService = new Service(nServiceId, nServiceName, parseInt(nServiceTime))
         dao.updateService(updatedService)
             .then(service => {
-                let index = availableServices.findIndex(s => s.serviceId === nServiceId);
+                const index = availableServices.findIndex(s => s.serviceId === nServiceId);
                 availableServices[index] = updatedService;
                 res.status(201).json(updatedService);
             })
             .catch(err => {
-                console.log(err, "PUT /api/services/:serviceId");
+                console.log(err, `PUT /api/services/${nServiceId}`);
                 res.status(503).json(ErrorMsgDb);
             });
     } else {
-        err = createErrorMsg("server /api/services/:serviceId", `You are trying to update a service that does not exists serviceId = ${nServiceId}, serviceName = ${req.body.ServiceName}`);
+        const err = createErrorMsg(`Server PUT /api/services/${nServiceId}`, `You are trying to update a service that does not exists: serviceId = ${nServiceId}, serviceName = ${req.body.ServiceName}`);
         res.status(400).json(err);
     }
 });
@@ -148,15 +167,21 @@ app.delete('/api/services/:serviceId', (req, res) => {
     const service = new Service(serviceId, null, null)
 
     dao.deleteService(service)
-        .then(() => res.send(`The service ${service.serviceId} was successfully deleted`))
+        .then(() => {
+            const indexServiceToDelete = availableServices.findIndex(elem => elem.serviceId === serviceId)
+            availableServices.splice(indexServiceToDelete, 1)
+            res.send(`The service ${service.serviceId} was successfully deleted`)
+            
+        })
         .catch(err => {
+            console.log(err, `/api/services/${serviceId}`)
             if (err === undefined) {
-                errMsg = createErrorMsg(`Server DELETE /api/services/:${service.serviceId}`, `Service ${service.serviceId} does not exists`)
-                console.log(errMsg)
-                res.status(503).json(errMsg)
+                const errMsg = createErrorMsg(`Server DELETE /api/services/:${service.serviceId}`, `Service (id == ${service.serviceId}) does not exists`);
+                console.log(errMsg);
+                res.status(503).json(errMsg);
                 return;
             }
-            res.status(503).json(ErrorMsgDb)
+            res.status(503).json(ErrorMsgDb);
         });
 
 });
@@ -166,10 +191,17 @@ app.delete('/api/services/:serviceId', (req, res) => {
 // NOTE: the important field are serviceId and counterId, the rest are ignored by the DB.
 // maybe pass only the counterId and serviceId
 app.post('/api/counterservices', (req, res) => {
-    serviceJson =  req.body.service;
-    counterJson = req.body.counter;
-    service = new Service(parseInt(serviceJson.serviceId), serviceJson.serviceName, parseInt(serviceJson.serviceTime));
-    counter = new Counter(parseInt(counterJson.counterId));
+    const serviceJson =  req.body.service;
+    const counterJson = req.body.counter;
+
+    if(serviceJson === undefined || counterJson === undefined) {
+        const errMsg = createErrorMsg("Server POST /api/counterservices", "service and/or counter are undefined")
+        res.status(400).json(errMsg)
+        return;
+    }
+
+    const service = new Service(parseInt(serviceJson.serviceId), serviceJson.serviceName, parseInt(serviceJson.serviceTime));
+    const counter = new Counter(parseInt(counterJson.counterId));
 
     dao.addCounterService(counter, service)
         .then(services => res.json(services))
@@ -184,10 +216,17 @@ app.post('/api/counterservices', (req, res) => {
 // NOTE: the important field are serviceId and counterId, the rest are ignored by the DB.
 // maybe pass only the counterId and serviceId
 app.delete('/api/counterservices', (req, res) => {
-    serviceJson =  req.body.service;
-    counterJson = req.body.counter;
-    service = new Service(parseInt(serviceJson.serviceId), serviceJson.serviceName, parseInt(serviceJson.serviceTime));
-    counter = new Counter(parseInt(counterJson.counterId));
+    const serviceJson =  req.body.service;
+    const counterJson = req.body.counter;
+
+    if(serviceJson === undefined || counterJson === undefined) {
+        const errMsg = createErrorMsg("Server DELETE /api/counterservices", "service and/or counter are undefined")
+        res.status(400).json(errMsg)
+        return;
+    }
+
+    const service = new Service(parseInt(serviceJson.serviceId), serviceJson.serviceName, parseInt(serviceJson.serviceTime));
+    const counter = new Counter(parseInt(counterJson.counterId));
 
     dao.deleteCounterService(counter, service)
         .then(() => res.send(`Service: ${service.serviceId} - Counter: ${counter.counterId} was successfully deleted`))
@@ -201,9 +240,8 @@ app.get('/api', (req, res) => res.json(APIRoutes))
 
 app.get('/test', async (req, res) => {
     try { 
-        tickets = await dao.getTickets()
-        counterServices = await dao.getCounterServices()
-        console.log(counterServices)
+        const counterServices = await dao.getCounterServices();
+        console.log(counterServices);
         res.send("OK")
     } catch (err) {
         res.send(err)
