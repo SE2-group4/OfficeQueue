@@ -1,6 +1,6 @@
 class Service{
-    constructor(serviceID,serviceName,serviceTime){
-        this.serviceID=serviceID;
+    constructor(serviceId,serviceName,serviceTime){
+        this.serviceId=serviceId;
         this.serviceName=serviceName;
         this.serviceTime=serviceTime;
     }

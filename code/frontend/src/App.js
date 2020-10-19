@@ -19,7 +19,7 @@ class App extends React.Component{
   };
 
   loadServices(){
-    API.getServicesT() //versione di test
+    API.getServices() 
     .then((res) => {
       this.setState({services: res})
     })
@@ -49,8 +49,8 @@ class App extends React.Component{
     });
   }
   
-  reqTicket= (serviceID) => {
-    API.getTicketT(serviceID) //versione di test
+  reqTicket= (serviceId) => {
+    API.getTicket(serviceId) 
     .then((res) => {
       this.setState({ticket: res})
     })
