@@ -75,8 +75,8 @@ exports.addService = function (service) {
  * @param {Service} service 
  */
 exports.updateService = function (service) {
-    return new Promise((reject, resolve) => {
-        const sql = "UPDATE Service SET serviceName = ? serviceTime = ? WHERE serviceId = ?";
+    return new Promise((resolve, reject) => {
+        const sql = "UPDATE Service SET serviceName = ?, serviceTime = ? WHERE serviceId = ?";
         db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], (err) => {
             if(err) {
                 reject(err);
@@ -93,14 +93,13 @@ exports.updateService = function (service) {
  * @param {Service} service 
  */
 exports.deleteService = function (service) {
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
         const sql = "DELETE FROM Service WHERE serviceId = ?";
         db.run(sql, [service.serviceId], (err) => {
             if(err) {
                 reject(err);
                 return;
             }
-
             resolve();
         })
     });
