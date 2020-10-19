@@ -9,11 +9,13 @@ class App extends React.Component{
 
   constructor(props) {
     super(props);
-    this.state = { services: [], ticket: null};
+    this.state = { services: [], ticket: null,counters : [], servicesCounters : []};
   };
 
   componentDidMount() {
     this.loadServices();
+    this.loadCounters();
+    this.loadServicesCounters();
   };
 
   loadServices(){
@@ -23,10 +25,30 @@ class App extends React.Component{
     })
     .catch(
     (errorObj) => {
-      //this.handleErrors(errorObj);
+      this.handleErrors(errorObj);
     });
   }
-
+  loadCounters(){
+    API.getCountersT() //versione di test
+    .then((res) => {
+      this.setState({counters: res})
+    })
+    .catch(
+    (errorObj) => {
+      this.handleErrors(errorObj);
+    });
+  }
+  loadServicesCounters(){
+    API.getServicesCountersT() //versione di test
+    .then((res) => {
+      this.setState({servicesCounters: res})
+    })
+    .catch(
+    (errorObj) => {
+      this.handleErrors(errorObj);
+    });
+  }
+  
   reqTicket= (serviceID) => {
     API.getTicketT(serviceID) //versione di test
     .then((res) => {
@@ -46,7 +68,7 @@ class App extends React.Component{
     return <Router>
       <Switch>
       <Route path="/admin" render={()=>{
-          return <AdminConfigurationPage services={this.state.services} loadServices={this.loadServices}/>}
+          return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters}/>}
         }>
         </Route>
         <Route path='/' render={(props) => {
