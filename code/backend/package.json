@@ -9,6 +9,9 @@
   "author": "group4",
   "license": "ISC",
   "dependencies": {
+    "async-mutex": "^0.2.4",
+    "express": "^4.17.1",
+    "express-validator": "^6.6.1",
     "sqlite": "^4.0.15"
   }
 }
