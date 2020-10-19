@@ -6,18 +6,21 @@ const baseurl='/api';
 
  let services= [{serviceID:'s1',serviceName:'servizio1',serviceTime:'10'},
                 {serviceID:'s2',serviceName:'servizio2',serviceTime:'15'},
-                {serviceID:'s3',serviceName:'servizio3',serviceTime:'20'}]
+                {serviceID:'s3',serviceName:'servizio3',serviceTime:'20'}];
+
+let servicesCounters = [{counterId : "c1",serviceID : "s2"},{counterId : "c2",serviceID: "s1"}];
+let counters = [{counterId : "c1"},{counterId : "c2"}];
 //getServices : versione test
 async function getServicesT(){
     return services;
 }
 
 async function getCountersT(){
-    return [{counterId : "c1"},{counterId : "c2"}];
+    return counters;
 }
 
 async function getServicesCountersT(){
-    return [{counterId : "c1",serviceID : "s2"},{counterId : "c2",serviceID: "s1"}];
+    return servicesCounters;
 }
 async function editServiceT(id,name,time){
     /*let service = services.filter((s)=>s.serviceID===id);
@@ -42,6 +45,18 @@ async function removeServiceT(id){
 }
 async function addServiceT(name,time){
     services.splice(services.length,1,new Service(services.length,name,time));
+}
+async function removeAssociationT(counterId,serviceId){
+    for (let i = 0;i<servicesCounters.length;i++)
+        if(servicesCounters[i].counterId==counterId && servicesCounters[i].serviceID==serviceId)
+            servicesCounters.splice(i,1);
+            
+}
+async function addAssociationT(counterId,serviceId){
+    let association;
+    association.counterId=counterId;
+    association.serviceID=serviceId;
+    servicesCounters.splice(servicesCounters.length,1,association);
 }
 /*------------------------------------*/
 //GET /api/services -> Service[]
@@ -92,5 +107,5 @@ async function getTicket(serviceID){
     
 }
 
-const API={getServices,getServicesT,getTicket,getTicketT,getCountersT,getServicesCountersT,editServiceT,removeServiceT,addServiceT};
+const API={getServices,getServicesT,getTicket,getTicketT,getCountersT,getServicesCountersT,editServiceT,removeServiceT,addServiceT,removeAssociationT,addAssociationT};
 export default API;

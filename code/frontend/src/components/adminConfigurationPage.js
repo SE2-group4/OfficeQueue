@@ -34,10 +34,10 @@ class AdminConfigurationPage extends React.Component {
         this.setState({mode : "servicesCounters"});
     }
     modifyService=(service)=>{
-        this.setState({show : true, modifyService : service});
+        this.setState({show : true, modifyService : service, modeShow : "editService"});
     }
     addService = ()=>{
-        this.setState({show : true});
+        this.setState({show : true, modeShow : "addService"});
     }
     removeService=(service)=>{
         this.props.removeService(service.serviceID);
@@ -53,14 +53,27 @@ class AdminConfigurationPage extends React.Component {
         this.props.addService(name,time);
         this.handleClose();
     }
+    removeAssociation = (counterId, serviceId) =>{
+        this.props.removeAssociation(counterId,serviceId);
+    }
+    addAssociationSubmit = (counterId, serviceId) => {
+        this.props.addAssociation(counterId,serviceId);
+        this.handleClose();
+    }
+    addAssociation = () => {
+        this.setState({show : true , services : this.props.services , counters : this.props.counters, modeShow : "addAssociation"})
+    }
     render(){
         return( 
             <>
-            {this.state.show && this.state.modifyService &&
-            <EditModal service={this.state.modifyService} handleClose={this.handleClose} handleSubmit={this.editSubmit}/>
+            {this.state.show && this.state.modeShow=="editService" &&
+            <EditModal service={this.state.modifyService} handleClose={this.handleClose} handleSubmit={this.editSubmit} mode ={this.state.modeShow}/>
             }
-            {this.state.show && !this.state.modifyService &&
-            <EditModal handleClose={this.handleClose} handleSubmit={this.addSubmit}/>
+            {this.state.show && this.state.modeShow=="addService" &&
+            <EditModal handleClose={this.handleClose} handleSubmit={this.addSubmit} mode ={this.state.modeShow}/>
+            }
+            {this.state.show && this.state.modeShow=="addAssociation" &&
+            <EditModal handleClose={this.handleClose} handleSubmit={this.addAssociationSubmit} services={this.state.services} counters = {this.state.counters} mode ={this.state.modeShow}/>
             }
         <Container fluid>
             <Jumbotron>
@@ -80,7 +93,7 @@ class AdminConfigurationPage extends React.Component {
                         <Content counters={this.props.counters}></Content>
                         }
                         {this.state.mode =="servicesCounters" &&
-                        <Content servicesCounters={this.props.servicesCounters}></Content>
+                        <Content servicesCounters={this.props.servicesCounters} remove={this.removeAssociation} add={this.addAssociation}></Content>
                         }
                     </Col>
                 </Row>
@@ -118,7 +131,7 @@ class AdminConfigurationPage extends React.Component {
                     {props.services.map((service) => <ContentItem key={service.serviceID} service={service} edit={props.edit} remove={props.remove}/>)}
                 </tbody>
             </Table>
-            <Button onClick={()=>props.add()}>Add a service!</Button>
+            <Button onClick={()=>props.add()}>Add a new service!</Button>
             </>
      );
      if(props.counters)
@@ -136,6 +149,7 @@ class AdminConfigurationPage extends React.Component {
             );
     if(props.servicesCounters)
         return(
+            <>
             <Table>
                 <thead>
                     <tr>
@@ -144,9 +158,11 @@ class AdminConfigurationPage extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.servicesCounters.map((service) => <ContentItem key={service.serviceID} serviceCounter={service} />)}
+                    {props.servicesCounters.map((service) => <ContentItem key={service.serviceID} serviceCounter={service} remove={props.remove}/>)}
                 </tbody>
             </Table>
+            <Button onClick={()=>props.add()}>Add a new association!</Button>
+            </>
         );
  }
  function ContentItem(props){
@@ -171,15 +187,18 @@ class AdminConfigurationPage extends React.Component {
         <tr>
             <td>{props.serviceCounter.counterId}</td>
             <td>{props.serviceCounter.serviceID}</td>
+            <td><Button onClick={()=>props.remove(props.serviceCounter.counterId,props.serviceCounter.serviceID)}>{trash}</Button></td>
         </tr>     
      );
  }
  class EditModal extends React.Component{
      constructor(props){
          super(props);
-         if(props.service)
+         if(props.mode=="editService")
             this.state={serviceName : props.service.serviceName, serviceTime : props.service.serviceTime}
-        else this.state={serviceName : "", serviceTime: ""};
+            else if(props.mode=="addAssociation")
+                this.state = {counterId : "", serviceId : ""}
+                    else this.state={serviceName : "", serviceTime: ""};
      }
      updateField = (name, value) => {
         this.setState({[name]: value});
@@ -190,18 +209,24 @@ class AdminConfigurationPage extends React.Component {
         if (!form.checkValidity()) {
         form.reportValidity();
         } else {
+            if(this.props.mode=="editService" || this.props.mode=="addService")
             this.props.handleSubmit(this.state.serviceName,this.state.serviceTime);
+            else this.props.handleSubmit(this.state.counterId,this.state.serviceId);
         }
     }
      render(){
          return (
              <Modal show={true} onHide={this.props.handleClose} >
                  <Modal.Header closeButton>
-                     <Modal.Title>Edit Service</Modal.Title>
+                     {this.props.mode=="editService" && <Modal.Title>Edit Service</Modal.Title>}
+                     {this.props.mode=="addAssociation" && <Modal.Title>Add Association</Modal.Title>}
+                     {this.props.mode=="addService" && <Modal.Title>Add Service</Modal.Title>}
                  </Modal.Header>
 
                  <Modal.Body>
                      <Form onSubmit={(event)=>this.onSubmit(event)}>
+                         {(this.props.mode=="editService" || this.props.mode=="addService") &&
+                         <>
                          <Form.Group>
                              <Form.Label>Service Name :</Form.Label>
                              <Form.Control type="text" name="serviceName" value={this.state.serviceName} required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} />
@@ -210,8 +235,32 @@ class AdminConfigurationPage extends React.Component {
                              <Form.Label>Estimated Time :</Form.Label>
                              <Form.Control type="text" name="serviceTime" value={this.state.serviceTime} required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} />
                          </Form.Group>
-                         <Button variant="secondary" onClick={() => this.props.handleClose()}>Close</Button>
-                         <Button variant="primary" type="submit">Save changes</Button>
+                         </>
+                        }
+                        {this.props.mode=="addAssociation" &&
+                        <>
+                            <Form.Group>
+                            <Form.Label>Counter Id :</Form.Label>
+                            <Form.Control as="select" name="counterId"  required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} >
+                            
+                            {
+                            this.props.counters.map((counter) =>(<option value={counter.counterId}>{counter.counterId}</option>))
+                            }
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Service Id :</Form.Label>
+                            <Form.Control as="select" name="serviceId"  required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} >
+                            
+                            {
+                            this.props.services.map((service) =>(<option value={service.serviceID}>{service.serviceID}</option>))
+                            }
+                            </Form.Control>
+                        </Form.Group>
+                        </>
+                        }
+                        <Button variant="secondary" onClick={() => this.props.handleClose()}>Close</Button>
+                        <Button variant="primary" type="submit">Save changes</Button>
                      </Form>
                  </Modal.Body>
 

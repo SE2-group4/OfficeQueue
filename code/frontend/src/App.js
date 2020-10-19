@@ -86,15 +86,31 @@ class App extends React.Component{
     .catch(
       (errorObj)=>{
         this.handleErrors(errorObj);
-  
-      }
-      )
+      })
+  }
+  removeAssociation = (counterId, serviceId) =>{
+    API.removeAssociationT(counterId,serviceId)
+    .then(this.loadServicesCounters())
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+      })
+  }
+  addAssociation = (counterId,serviceId) =>{
+    API.addAssociationT(counterId,serviceId)
+    .then(this.loadServicesCounters())
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+      })
   }
   render(){
     return <Router>
       <Switch>
       <Route path="/admin" render={()=>{
-          return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters} addService={this.addService} removeService={this.removeService} editService={this.editService}/>}
+          return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters} 
+                    addService={this.addService} removeService={this.removeService} editService={this.editService} removeAssociation={this.removeAssociation} 
+                    addAssociation={this.addAssociation}/>}
         }>
         </Route>
         <Route path='/' render={(props) => {
