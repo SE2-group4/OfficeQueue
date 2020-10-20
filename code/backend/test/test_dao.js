@@ -9,6 +9,7 @@
 
 const { fail } = require('assert');
 const assert = require('assert');
+const { exception } = require('console');
 const Counter = require('../counter.js');
 const Service = require('../service.js');
 const Ticket = require('../ticket.js');
@@ -16,6 +17,10 @@ const dao = require('./../dao.js');
 const prepare = require('./../prepare_db.js').prepare;
 
 const suite = describe('dao.js', function(){
+    before(function() {
+        dao.init({ dbpath: './testing.db' });
+    });
+
     beforeEach(function(done) {
         prepare(done, false);
     });
@@ -27,7 +32,6 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail();
-                done();
             });
         });
     });
@@ -39,7 +43,6 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail();
-                done();
             });
         });
     });
@@ -52,7 +55,6 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail();
-                done();
             });
         })
     });
@@ -71,7 +73,7 @@ const suite = describe('dao.js', function(){
             const updatedService = new Service(service.serviceId, 'new name', 1800); // same serviceId
 
             dao.updateService(updatedService).then((retVal) => {
-                assert.strictEqual(service.serviceId, retVal, "Data cannot be updated");
+                assert.strictEqual(retVal, 1, "Data cannot be updated");
                 done();
             }).catch((err) => {
                 fail(err);
@@ -79,16 +81,11 @@ const suite = describe('dao.js', function(){
             });
         });
 
-        it("update not existing service should send an error", function(done) {
+        it("update not existing service should send an error", async function() {
             const service = new Service(0, 'new name', 1800);
 
-            dao.updateService(service).then((retVal) => {
-                fail(retVal);
-                done();
-            }).catch((err) => {
-                assert.ok(true);
-                done();
-            });
+            const retVal = await dao.updateService(service);
+            assert.strictEqual(retVal, 0, "Another row has been modified");
         });
     });
 
@@ -104,24 +101,18 @@ const suite = describe('dao.js', function(){
 
         it("delete existing service should notify correct delete", function(done) {
             dao.deleteService(service).then((retVal) => {
-                assert.strictEqual(service.serviceId, retVal, "Data cannot be deleted");
+                assert.strictEqual(retVal, 1, "Data cannot be deleted");
                 done();
             }).catch((err) => {
                 fail(err);
-                done();
             });
         });
 
-        it("delete not existing service should send an error", function(done) {
-            const service = new Service(499); // same serviceId
+        it("delete not existing service should send an error", async function() {
+            const service = new Service(666);
 
-            dao.deleteService(service).then((retVal) => {
-                fail(retVal);
-                done();
-            }).catch((err) => {
-                assert.ok(true);
-                done();
-            });
+            const retVal = await dao.deleteService(service);
+            assert.strictEqual(retVal, 0,  "A wrong line has been deleted");
         });
     });
 
@@ -171,21 +162,15 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail(err);
-                done();
             });
         });
 
-        it("delete not existing counter-service should send an error", function(done) {
+        it("delete not existing counter-service should send an error", async function() {
             const counter = new Counter(999);
             const service = new Service(999);
 
-            dao.deleteCounterService(counter, service).then((retVal) => {
-                fail(retVal);
-                done();
-            }).catch((err) => {
-                assert.ok(true);
-                done();
-            });
+            const retVal = await dao.deleteCounterService(counter, service);
+            assert.strictEqual(retVal, 0, "A wrong line has been deleted");
         });
     });
 
@@ -196,7 +181,6 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail(err);
-                done();
             });
         });
 
@@ -206,7 +190,6 @@ const suite = describe('dao.js', function(){
                 done();
             }).catch((err) => {
                 fail(err);
-                done();
             });
         });
     });
@@ -217,8 +200,7 @@ const suite = describe('dao.js', function(){
                 assert.strictEqual(results.length, 6, "Wrong number of counter - service relationships");
                 done();
             }).catch((err) => {
-                fail();
-                done();
+                fail(err);
             });
         });
     });
