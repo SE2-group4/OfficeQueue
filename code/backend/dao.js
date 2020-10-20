@@ -9,9 +9,9 @@
 
 const moment = require('moment');
 const sqlite = require('sqlite3');
-const db_file = './testing.db'; // relative reference for testing
-// const db_file = './office_queue.db';
-const db = new sqlite.Database(db_file, (err) => {
+const dbpath = './testing.db'; // relative reference for testing
+// const dbpath = './office_queue.db';
+let db = new sqlite.Database(dbpath, (err) => {
     if (err) throw err;
 });
 
@@ -20,8 +20,7 @@ const Counter = require('./counter.js');
 const Ticket = require('./ticket.js');
 
 exports.init = function({dbpath}) {
-    dbPath = dbpath;
-    db = new sqlite.Database(dbPath, (err) => {
+    db = new sqlite.Database(dbpath, (err) => {
         if (err) throw err;
     });
 }
