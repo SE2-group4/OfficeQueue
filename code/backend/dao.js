@@ -7,8 +7,11 @@
 
 'use strict';
 
-const sqlite = require('sqlite');
-const db = new sqlite.Database('office_queue.db', (err) => {
+const moment = require('moment');
+const sqlite = require('sqlite3');
+const db_file = './testing.db'; // relative reference for testing
+// const db_file = './office_queue.db';
+const db = new sqlite.Database(db_file, (err) => {
     if (err) throw err;
 });
 
@@ -87,13 +90,13 @@ exports.addService = function (service) {
 exports.updateService = function (service) {
     return new Promise((resolve, reject) => {
         const sql = "UPDATE Service SET serviceName = ?, serviceTime = ? WHERE serviceId = ?";
-        db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], (err) => {
+        db.run(sql, [service.serviceName, service.serviceTime, service.serviceId], function(err) {
             if(err) {
                 reject(err);
                 return;
             }
 
-            resolve(this.changes);
+            resolve(this.lastID);
         })
     });
 }
@@ -106,12 +109,13 @@ exports.updateService = function (service) {
 exports.deleteService = function (service) {
     return new Promise((resolve, reject) => {
         const sql = "DELETE FROM Service WHERE serviceId = ?";
-        db.run(sql, [service.serviceId], (err) => {
+        db.run(sql, [service.serviceId], function(err) {
             if(err) {
                 reject(err);
                 return;
             }
-            resolve(this.changes);
+
+            resolve(this.lastID);
         })
     });
 }
@@ -123,14 +127,14 @@ exports.deleteService = function (service) {
  */
 exports.addTicket = function (ticket) {
     return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO Ticket(ticketId, date, serviceId, estimatedTime) VALUES (?, ?, ?, ?)";
-        db.run(sql, [ticket.ticketId, ticket.date.toISOString(), ticket.serviceId, ticket.estimatedTime], function(err) {
+        const sql = "INSERT INTO Ticket(ticketId, date, serviceId, estimatedTime) VALUES (?, DATE(?), ?, ?)";
+        db.run(sql, [ticket.ticketId, moment(ticket.date).format("YYYY-MM-DD"), ticket.serviceId, ticket.estimatedTime], function(err) {
             if(err) {
                 reject(err);
                 return;
             }
 
-            resolve(this.lastId);
+            resolve(this.lastID);
         });
     });
 }
@@ -182,20 +186,14 @@ exports.deleteCounterService = function (counter, service) {
  */
 exports.getLastTicketIdByDay = function (date) {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT MAX(ticketId) FROM Ticket WHERE date = DATE(?)";
-        db.get(sql, [date.toISOString()], (err, rows) => {
-            if(err) {
-                reject(err);
+        const sql = "SELECT MAX(ticketId) AS ticketId FROM Ticket WHERE date = DATE(?)";
+        db.get(sql, [(moment(date).format("YYYY-MM-DD"))], (err, row) => {
+            if(err || !row || !row.ticketId) {
+                resolve(new Ticket(0));
                 return;
             }
 
-            if(rows.length != 1) {
-                reject({ error: "no tickets" });
-                return;
-            }
-
-            const ticket = new Ticket(rows[0]);
-            resolve(ticket);
+            resolve(Ticket.fromRow(row));
         });
     });
 }
