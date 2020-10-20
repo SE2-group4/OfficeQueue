@@ -1,50 +1,56 @@
-/**
- * prepare a testing DB
- * read queries from the <sql_file> and run them against the testing DB
+/* prepare a testing DB
+ * read queries from the <sqlFile> and run them against the testing DB
  * 
  * @author Gastaldi Paolo
-*/
-
+ */
 'use strict';
-
-const sql_file = './testing.db';
 const sqlite = require('sqlite3');
-const db = new sqlite.Database(sql_file, (err) => {
-    if(err) 
-        console.log("Error creating DB connection!");
-});
 const fs = require('fs');
 
-let count = 0; // line counter
+exports.setup = function(dbpath) {
+    return new Promise((resolve, reject) => {
+        const sqlFile = "./testing.sql";
+        const dbPath = dbpath;
+        const db = new sqlite.Database(dbPath, (err) => {
+            if(err) 
+                console.log("Error creating DB connection!");
+        });
+        console.log("Resetting the database at '" + dbPath + "' ...");
 
-console.log("Preparing your DB...");
+        let count = 0; // line counter
 
-const dataSql = fs.readFileSync('./testing.sql').toString();
-const dataArr = dataSql.toString().split(';');
+        const dataSql = fs.readFileSync(sqlFile).toString();
+        const dataArr = dataSql.toString().split(';');
+        dataArr.forEach((str, index, array) => {
+            array[index] = str.replace(/(\r\n|\n|\r)/gm, "");
+        });
 
-db.serialize(() => {
-    // db.run runs your SQL query against the DB
-    db.run('PRAGMA foreign_keys=OFF;');
-    db.run('BEGIN TRANSACTION;');
-    // Loop through the `dataArr` and db.run each query
-    dataArr.forEach((query) => {
-        count++;
-        if(query) {
-            db.run(query, (err) => {
-                if(err) {
-                    console.error(`> Error in line ${count}`);
-                    console.error(err);
+        db.serialize(() => {
+            // db.run runs your SQL query against the DB
+            db.run('PRAGMA foreign_keys=OFF;');
+            db.run('BEGIN TRANSACTION;');
+            // Loop through the `dataArr` and db.run each query
+            dataArr.forEach((query) => {
+                count++;
+                //console.log(query);
+                if(query) {
+                    db.run(query, (err) => {
+                        if(err) {
+                            console.error(`> Error in line ${count} query:${query}`);
+                            console.error(err);
+                        }
+                    });
                 }
             });
-        }
-    });
-    db.run('COMMIT;');
-});
 
-// Close the DB connection
-db.close((err) => {
-    if (err) {
-        return console.error(err.message);
-    }
-    console.log("The testing DB is ready, enjoy! :)");
-});
+            db.run('COMMIT;');
+
+            db.close((err) => {
+                if (err) {
+                    reject(err.message);
+                }
+                resolve(`The database at '${dbPath}' is ready, enjoy! :)`);
+            });
+        });
+    });
+}

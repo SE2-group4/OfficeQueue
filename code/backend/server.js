@@ -1,20 +1,24 @@
 'use strict'
 
 const express = require("express");
-const dao = require("./dao.js"); 
-const Mutex = require('async-mutex').Mutex;
 const morgan = require('morgan');
+const Mutex = require('async-mutex').Mutex;
 const { body, validationResult } = require('express-validator');
 
+const dao = require("./dao.js"); 
+const test = require('./prepare_db.js');
 const Service = require('./service.js')
 const Ticket = require('./ticket.js')
 const Counter = require('./counter.js')
 
 const app = express()
+const lastTicketIdMutex = new Mutex();
+
+// system parameters
 const PORT = 3001;
 let lastTicketId = null;
 let availableServices = null;
-const lastTicketIdMutex = new Mutex();
+let dbpath = "./office_queue.db"
 
 app.use(express.json())
 app.use(morgan("combined"))
@@ -67,9 +71,7 @@ function createErrorMsg(from, msg) {
     return err
 }
 
-
-/*
- * Get a new ticket for the service.serviceId = serviceId 
+/* Get a new ticket for the service.serviceId = serviceId 
  * @param none 
  * @route_parameter none 
  * @returns status: 400 for non-existing serviceId, 200 for normal execution, and 503 for db error
@@ -101,8 +103,7 @@ app.get('/api/tickets/:serviceId', async (req, res) => {
 
 });
 
-/*
- * Get all the available services
+/* Get all the available services
  * @param none 
  * @returns status: 200 for normal execution, 503 for db error
  * @returns an errorMsg 503. Returns an array of Services (in json) for status code 200 
@@ -116,10 +117,20 @@ app.get('/api/services', (req, res) => {
         });
 });
 
+app.get('/api/tickets', async (req, res) => {
+    try { 
+        const result = await dao.getTickets();
+        const id = await dao.getLastTicketIdByDay(new Date())
+        console.log("Last ticket ID of " + new Date().toISOString(), id);
+        res.status(200).json(result);
+    } catch (err) {
+        console.log(err);
+    }
+});
 /* Request to add a new service to the system 
  * @param Service in json. Example {"serviceName": "foo", "serviceTime": 400}
  * @returns status: 201 for normal execution, 400 for undefined fields and for a serviceName already present in the current available services, and 503 for db error
- * @returns an errorMsg 400, 503. Returns the newly created Service as json for status code 200 
+ * @returns an errorMsg 400, 503. Returns the newly created Service as json for status code 201 
  */
 app.post('/api/services', (req, res) => {
 
@@ -290,11 +301,20 @@ app.get('/api', (req, res) => res.json(APIRoutes))
 
 app.get('/test', async (req, res) => {
     try { 
-        const tickets = await dao.getTickets();
-        const ok = await dao.getLastTicketIdByDay(new Date());
-        const counterServices = await dao.getCounterServices();
-        console.log(counterServices);
-        res.send("OK")
+        const dppath = "./testing.db"
+        const ris = await test.setup(dbpath);
+        console.log(ris)
+        try {
+            lastTicketId = await dao.getLastTicketIdByDay(new Date());
+            availableServices = await dao.getServices(); 
+            //console.log("LAST TICKET ID", lastTicketId)
+        }
+        catch (err) { 
+            msg = createErrorMsg("Server", "Failed updating 'availableServices' at /test")
+            console.log(msg)
+            throw(err)
+        };
+        res.json(200).send();
     } catch (err) {
         res.send(err)
     }
@@ -306,28 +326,30 @@ app.all('*', (req, res) => {
 
 const init = async () => {
     if (lastTicketId === null) {
-        await dao.getLastTicketIdByDay(new Date())
-            .then(ret => lastTicketId = ret)
-            .catch(err => {
-                if (err.error === "no tickets") {
-                    lastTicketId = 0
-                }
-                else {
-                    throw (err)
-                    msg = createErrorMsg("DB", "Failed getLastTicketIdByDay at init")
-                    console.log(msg)
-                }
-            });
+        try {
+            lastTicketId = await dao.getLastTicketIdByDay(new Date());
+        }
+        catch (err) {
+            if (err.error === "no tickets") {
+                lastTicketId = 0
+            }
+            else {
+                msg = createErrorMsg("server", "Failed at initializing 'lastTicketId' at init")
+                console.log(msg)
+                throw (err)
+            }
+        };
     }
 
     if (availableServices === null) {
-        await dao.getServices()
-            .then(services => availableServices = services)
-            .catch(err => {
-                msg = createErrorMsg("DB", "Failed getServices at init")
-                console.log(msg)
-                throw(err)
-            });
+        try {
+            availableServices = await dao.getServices(); 
+        }
+        catch (err) { 
+            msg = createErrorMsg("Server", "Failed updating 'availableServices' at init")
+            console.log(msg)
+            throw(err)
+        };
     }
 }
 
@@ -336,11 +358,18 @@ function printConfig() {
     console.log("Last ticket id", lastTicketId)
     console.log("Available Services:")
     console.log(availableServices)
+    console.log("Current database path:", dbpath)
 }
 
 (async () => {
     try { 
-        console.log("Initializing the system")
+        console.log("INITIALIZING the system")
+        if (process.argv[2] === "--test") {
+            dbpath = "./testing.db"
+            const ris = await test.setup(dbpath);
+            console.log(ris)
+        }
+        await dao.init({"dbpath": dbpath})
         await init();
         printConfig();
         app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

@@ -8,13 +8,22 @@
 'use strict';
 
 const sqlite = require('sqlite3');
-const db = new sqlite.Database('office_queue.db', (err) => {
-    if (err) throw err;
-});
+let dbPath = null;
+let db = null;
+//new sqlite.Database(dbPath, (err) => {
+//    if (err) throw err;
+//});
 
 const Service = require('./service.js');
 const Counter = require('./counter.js');
 const Ticket = require('./ticket.js');
+
+exports.init = function({dbpath}) {
+    dbPath = dbpath;
+    db = new sqlite.Database(dbPath, (err) => {
+        if (err) throw err;
+    });
+}
 
 /**
  * get all services
@@ -220,3 +229,4 @@ exports.getCounterServices = function () {
         });
     });
 }
+
