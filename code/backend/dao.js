@@ -31,7 +31,7 @@ exports.init = function({dbpath}) {
  */
 exports.getServices = function () {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM Service"
+        const sql = "SELECT * FROM Service";
         db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err);
@@ -41,6 +41,7 @@ exports.getServices = function () {
                 rows.forEach(row => {
                     services.push(Service.fromRow(row));
                 });
+
                 resolve(services);
             }
         });
@@ -195,11 +196,11 @@ exports.getLastTicketIdByDay = function (date) {
         const sql = "SELECT MAX(ticketId) AS ticketId FROM Ticket WHERE date = DATE(?)";
         db.get(sql, [(moment(date).format("YYYY-MM-DD"))], (err, row) => {
             if(err || !row || !row.ticketId) {
-                resolve(new Ticket(0));
+                resolve(0);
                 return;
             }
 
-            resolve(Ticket.fromRow(row));
+            resolve(row.ticketId);
         });
     });
 }

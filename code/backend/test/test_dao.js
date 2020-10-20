@@ -191,8 +191,8 @@ const suite = describe('dao.js', function(){
 
     describe('getLastTicketIdByDate', function(){
         it('existing date should return max value', function(done) {
-            dao.getLastTicketIdByDay(new Date()).then((ticket) => {
-                assert.strictEqual(ticket.ticketId, 3, "Not the maximumn value");
+            dao.getLastTicketIdByDay(new Date()).then((ticketId) => {
+                assert.strictEqual(ticketId, 3, "Not the maximumn value");
                 done();
             }).catch((err) => {
                 fail(err);
@@ -201,8 +201,8 @@ const suite = describe('dao.js', function(){
         });
 
         it('not existing date should return 0', function(done) {
-            dao.getLastTicketIdByDay(new Date('1970/01/01')).then((ticket) => {
-                assert.strictEqual(ticket.ticketId, 0, "No values can be found");
+            dao.getLastTicketIdByDay(new Date('1970/01/01')).then((ticketId) => {
+                assert.strictEqual(ticketId, 0, "No values can be found");
                 done();
             }).catch((err) => {
                 fail(err);
