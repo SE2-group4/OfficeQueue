@@ -5,6 +5,8 @@
 
 'use strict'
 
+const moment = require('moment');
+
 /**
  * 
  */
@@ -18,7 +20,7 @@ class Ticket {
      */
     constructor(ticketId = -1, date, serviceId, estimatedTime) {
         this.ticketId = ticketId;
-        this.date = date;
+        this.date = moment(date);
         this.serviceId = serviceId;
         this.estimatedTime = estimatedTime;
 
