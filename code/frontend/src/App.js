@@ -19,7 +19,7 @@ class App extends React.Component{
   };
 
   loadServices(){
-    API.getServices() 
+    API.getServicesT() //versione di test
     .then((res) => {
       this.setState({services: res})
     })
@@ -97,6 +97,8 @@ class App extends React.Component{
       })
   }
   addAssociation = (counterId,serviceId) =>{
+    console.log(counterId);
+    console.log(serviceId);
     API.addAssociationT(counterId,serviceId)
     .then(this.loadServicesCounters())
     .catch(
@@ -104,18 +106,26 @@ class App extends React.Component{
         this.handleErrors(errorObj);
       })
   }
+  removeCounter = (counterId) => {
+    API.removeCounterT(counterId)
+    .then(this.loadCounters)
+    .catch(
+      (errorObj)=>{
+        this.handleErrors(errorObj);
+      })
+  }
   render(){
     return <Router>
+      <AppTitle/>
       <Switch>
       <Route path="/admin" render={()=>{
           return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters} 
                     addService={this.addService} removeService={this.removeService} editService={this.editService} removeAssociation={this.removeAssociation} 
-                    addAssociation={this.addAssociation}/>}
+                    addAssociation={this.addAssociation} removeCounter={this.removeCounter}/>}
         }>
         </Route>
         <Route path='/' render={(props) => {
           return <>
-          <AppTitle/>
           <TicketForm services={this.state.services} ticket={this.state.ticket} reqTicket={this.reqTicket}/>
           </>;
         }}> 
