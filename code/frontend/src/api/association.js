@@ -1,7 +1,7 @@
 class Association{
     constructor(counterId,serviceId){
         this.counterId=counterId;
-        this.serviceID=serviceId;
+        this.serviceId=serviceId;
     }
 
     static from(json){

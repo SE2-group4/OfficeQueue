@@ -3,70 +3,7 @@ import Ticket from './ticket.js';
 import Association from './association.js';
 const baseurl='/api';
 
-/*---------TEST VERSION--------------*/
 
- let services= [{serviceId:'s1',serviceName:'servizio1',serviceTime:'10'},
-                {serviceId:'s2',serviceName:'servizio2',serviceTime:'15'},
-                {serviceId:'s3',serviceName:'servizio3',serviceTime:'20'}];
-
-let servicesCounters = [{counterId : "c1",serviceId : "s2"},{counterId : "c2",serviceId: "s1"}];
-let counters = [{counterId : "c1"},{counterId : "c2"}];
-//getServices : versione test
-async function getServicesT(){
-    return services;
-}
-
-async function getCountersT(){
-    return counters;
-} 
-
-async function getServicesCountersT(){
-    return servicesCounters;
-}
-async function editServiceT(id,name,time){
-    console.log(id);
-    console.log(name);
-    console.log(time);
-    for (let i=0;i<services.length;i++)
-        if(services[i].serviceId===id){
-            services[i].serviceName=name;
-            services[i].serviceTime=time;
-        }
-    console.log(services);
-}
-async function removeServiceT(id){
-    let c=0;
-    for (let s of services){
-        if(s.serviceId===id)
-            services.splice(c,1);
-        c++;
-    }
-
-}
-async function addServiceT(name,time){
-    services.splice(services.length,1,new Service(services.length,name,time));
-}
-async function removeAssociationT(counterId,serviceId){
-    for (let i = 0;i<servicesCounters.length;i++)
-        if(servicesCounters[i].counterId==counterId && servicesCounters[i].serviceId==serviceId)
-            servicesCounters.splice(i,1);
-            
-}
-async function addAssociationT(counterId,serviceId){
-    console.log(counterId);
-    console.log(serviceId);
-    servicesCounters.splice(servicesCounters.length,1,new Association(counterId,serviceId));
-    console.log(servicesCounters);
-}
-async function removeCounterT(counterId){
-    for (let i=0;i<counters.length;i++)
-        if(counters[i].counterId===counterId)
-            counters.splice(i,1);
-}
-
-async function getTicketT(serviceID){
-    return {ticketID:'t1',date:'',serviceID:serviceID,estimatedTime:'1h20min'};
-}
 /*------------------------------------*/
 //POST /api/services 
 async function addService(name,time){
@@ -113,6 +50,7 @@ async function getServices(){
         }).catch((err) => { reject({ errors: [{ param: "Server", msg: "Cannot communicate" }] }) }); // connection errors
     });
 }
+
 //GET /api/counterservices
 //todo
 
@@ -126,6 +64,7 @@ async function removeService(id){
         }).catch((err)=>{ reject({ errors: [{ param: "Server", msg: "Cannot communicate" }] }) })
     });
 };
+
 //POST /api/counterservices
 async function addAssociation(counter,service){
     return new Promise((resolve, reject) => {
@@ -144,6 +83,7 @@ async function addAssociation(counter,service){
         }).catch((err) => { reject({ errors: [{ param: "Server", msg: "Cannot communicate" }] }) }); // connection errors
     });
 }
+
 //PUT /api/services/:serviceId
 async function editService(id,name,time){
     return new Promise((resolve, reject) => {
@@ -162,6 +102,7 @@ async function editService(id,name,time){
         }).catch((err) => { reject({ errors: [{ param: "Server", msg: "Cannot communicate" }] }) }); // connection errors
     });
 }
+
 //GET /api/tickets/:serviceID -> Ticket
 async function getTicket(serviceID){
     return new Promise((resolve,reject) => {
@@ -184,5 +125,5 @@ async function getTicket(serviceID){
     
 }
 
-const API={getServices,getServicesT,getTicket,addService,addAssociation,removeService,editService,getTicketT,getCountersT,getServicesCountersT,editServiceT,removeServiceT,addServiceT,removeAssociationT,addAssociationT,removeCounterT};
+const API={getServices,getTicket,addService,addAssociation,removeService,editService};
 export default API;

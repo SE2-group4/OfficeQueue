@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch, Redirect, Link } from 'react-ro
 import AdminConfigurationPage from "./components/adminConfigurationPage";
 import AppTitle from './AppTitle.js';
 import API from './api/API.js';
+import APITest from './test/APITest.js';
 import {TicketForm} from './components/userComp.js';
 
 class App extends React.Component{
@@ -28,8 +29,9 @@ class App extends React.Component{
       this.handleErrors(errorObj);
     });
   }
+
   loadCounters(){
-    API.getCountersT() //versione di test
+    APITest.getCountersT() //versione di test
     .then((res) => {
       this.setState({counters: res})
     })
@@ -38,8 +40,9 @@ class App extends React.Component{
       this.handleErrors(errorObj);
     });
   }
+
   loadServicesCounters(){
-    API.getServicesCountersT() //versione di test
+    APITest.getServicesCountersT() //versione di test
     .then((res) => {
       this.setState({servicesCounters: res})
     })
@@ -63,6 +66,7 @@ class App extends React.Component{
   handleErrors(errorObj){
     //to_do
   }
+
   editService = (id,name,time) =>{
     API.editService(id,name,time)
     .then(this.loadServices())
@@ -72,6 +76,7 @@ class App extends React.Component{
       }
     )
   }
+
   removeService = (id) =>{
     API.removeService(id)
     .then(this.loadServices())
@@ -80,6 +85,7 @@ class App extends React.Component{
         this.handleErrors(errorObj);
       })
   }
+
   addService = (name,time) =>{
     API.addService(name,time)
     .then(this.loadServices())
@@ -88,14 +94,16 @@ class App extends React.Component{
         this.handleErrors(errorObj);
       })
   }
+
   removeAssociation = (counterId, serviceId) =>{
-    API.removeAssociationT(counterId,serviceId)
+    APITest.removeAssociationT(counterId,serviceId)
     .then(this.loadServicesCounters())
     .catch(
       (errorObj)=>{
         this.handleErrors(errorObj);
       })
   }
+
   addAssociation = (counterId,serviceId) =>{
     let counter;
     let service;
@@ -114,14 +122,16 @@ class App extends React.Component{
         this.handleErrors(errorObj);
       })
   }
+
   removeCounter = (counterId) => {
-    API.removeCounterT(counterId)
+    APITest.removeCounterT(counterId) 
     .then(this.loadCounters)
     .catch(
       (errorObj)=>{
         this.handleErrors(errorObj);
       })
   }
+
   render(){
     return <Router>
       <AppTitle/>
