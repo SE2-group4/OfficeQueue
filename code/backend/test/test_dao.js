@@ -13,7 +13,7 @@ const Counter = require('../counter.js');
 const Service = require('../service.js');
 const Ticket = require('../ticket.js');
 const dao = require('./../dao.js');
-const prepare = require('./../prepare_db.js');
+const prepare = require('./../prepare_db.js').prepare;
 
 const suite = describe('dao.js', function(){
     beforeEach(function(done) {

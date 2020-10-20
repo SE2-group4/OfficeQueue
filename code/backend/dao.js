@@ -19,6 +19,13 @@ const Service = require('./service.js');
 const Counter = require('./counter.js');
 const Ticket = require('./ticket.js');
 
+exports.init = function({dbpath}) {
+    dbPath = dbpath;
+    db = new sqlite.Database(dbPath, (err) => {
+        if (err) throw err;
+    });
+}
+
 /**
  * get all services
  * @returns {Array} list of services
@@ -182,7 +189,7 @@ exports.deleteCounterService = function (counter, service) {
 /**
  * get the highest ticket ID given a certain date
  * @param {Date} date
- * @returns {Ticket} ticket
+ * @returns {int} ticketId 
  */
 exports.getLastTicketIdByDay = function (date) {
     return new Promise((resolve, reject) => {
@@ -219,3 +226,4 @@ exports.getCounterServices = function () {
         });
     });
 }
+

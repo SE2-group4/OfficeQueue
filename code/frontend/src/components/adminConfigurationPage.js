@@ -40,13 +40,13 @@ class AdminConfigurationPage extends React.Component {
         this.setState({show : true, modeShow : "addService"});
     }
     removeService=(service)=>{
-        this.props.removeService(service.serviceID);
+        this.props.removeService(service.serviceId);
     }
     handleClose = ()=>{
         this.setState({show : false, modifyService : null});
     }
     editSubmit = (name,time)=>{
-        this.props.editService(this.state.modifyService.serviceID,name,time);
+        this.props.editService(this.state.modifyService.serviceId,name,time);
         this.handleClose();
     }
     addSubmit = (name,time) =>{
@@ -57,6 +57,8 @@ class AdminConfigurationPage extends React.Component {
         this.props.removeAssociation(counterId,serviceId);
     }
     addAssociationSubmit = (counterId, serviceId) => {
+        console.log(counterId);
+        console.log(serviceId);
         this.props.addAssociation(counterId,serviceId);
         this.handleClose();
     }
@@ -90,7 +92,7 @@ class AdminConfigurationPage extends React.Component {
                         <Content services={this.props.services} edit={this.modifyService} remove={this.removeService} add={this.addService}></Content>
                         }
                         {this.state.mode =="counters" &&
-                        <Content counters={this.props.counters}></Content>
+                        <Content counters={this.props.counters} remove={this.props.removeCounter}></Content>
                         }
                         {this.state.mode =="servicesCounters" &&
                         <Content servicesCounters={this.props.servicesCounters} remove={this.removeAssociation} add={this.addAssociation}></Content>
@@ -128,7 +130,7 @@ class AdminConfigurationPage extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.services.map((service) => <ContentItem key={service.serviceID} service={service} edit={props.edit} remove={props.remove}/>)}
+                    {props.services.map((service) => <ContentItem key={service.serviceId} service={service} edit={props.edit} remove={props.remove}/>)}
                 </tbody>
             </Table>
             <Button onClick={()=>props.add()}>Add a new service!</Button>
@@ -143,7 +145,7 @@ class AdminConfigurationPage extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.counters.map((counter) => <ContentItem key={counter.counterId} counter={counter} />)}
+                    {props.counters.map((counter) => <ContentItem key={counter.counterId} counter={counter} remove={props.remove}/>)}
                 </tbody>
             </Table>
             );
@@ -158,7 +160,7 @@ class AdminConfigurationPage extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.servicesCounters.map((service) => <ContentItem key={service.serviceID} serviceCounter={service} remove={props.remove}/>)}
+                    {props.servicesCounters.map((service) => <ContentItem key={service.serviceId} serviceCounter={service} remove={props.remove}/>)}
                 </tbody>
             </Table>
             <Button onClick={()=>props.add()}>Add a new association!</Button>
@@ -169,7 +171,7 @@ class AdminConfigurationPage extends React.Component {
      if(props.service)
      return(
         <tr>
-            <td>{props.service.serviceID}</td>
+            <td>{props.service.serviceId}</td>
             <td>{props.service.serviceName}</td>
             <td>{props.service.serviceTime}</td>
             <td><Button onClick={()=>props.remove(props.service)}>{trash}</Button></td>
@@ -180,14 +182,15 @@ class AdminConfigurationPage extends React.Component {
      return(
         <tr>
             <td>{props.counter.counterId}</td>
+            
         </tr>
      );
      if(props.serviceCounter)
      return(
         <tr>
             <td>{props.serviceCounter.counterId}</td>
-            <td>{props.serviceCounter.serviceID}</td>
-            <td><Button onClick={()=>props.remove(props.serviceCounter.counterId,props.serviceCounter.serviceID)}>{trash}</Button></td>
+            <td>{props.serviceCounter.serviceId}</td>
+            <td><Button onClick={()=>props.remove(props.serviceCounter.counterId,props.serviceCounter.serviceId)}>{trash}</Button></td>
         </tr>     
      );
  }
@@ -211,7 +214,11 @@ class AdminConfigurationPage extends React.Component {
         } else {
             if(this.props.mode=="editService" || this.props.mode=="addService")
             this.props.handleSubmit(this.state.serviceName,this.state.serviceTime);
-            else this.props.handleSubmit(this.state.counterId,this.state.serviceId);
+            else {
+                console.log(this.state.counterId);
+                console.log(this.state.serviceId);
+                this.props.handleSubmit(this.state.counterId,this.state.serviceId);
+            }
         }
     }
      render(){
@@ -242,7 +249,7 @@ class AdminConfigurationPage extends React.Component {
                             <Form.Group>
                             <Form.Label>Counter Id :</Form.Label>
                             <Form.Control as="select" name="counterId"  required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} >
-                            
+                            <option>choose an option..</option>
                             {
                             this.props.counters.map((counter) =>(<option value={counter.counterId}>{counter.counterId}</option>))
                             }
@@ -251,9 +258,9 @@ class AdminConfigurationPage extends React.Component {
                         <Form.Group>
                             <Form.Label>Service Id :</Form.Label>
                             <Form.Control as="select" name="serviceId"  required={true} onChange={(ev) => this.updateField(ev.target.name, ev.target.value)} >
-                            
+                            <option>choose an option..</option>
                             {
-                            this.props.services.map((service) =>(<option value={service.serviceID}>{service.serviceID}</option>))
+                            this.props.services.map((service) =>(<option value={service.serviceId}>{service.serviceId}</option>))
                             }
                             </Form.Control>
                         </Form.Group>

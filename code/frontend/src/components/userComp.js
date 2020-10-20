@@ -11,7 +11,7 @@ import '../custom.css';
 class TicketForm extends React.Component{
     constructor(props){
         super(props);
-        this.state={service: null, serviceID: ""};
+        this.state={serviceId: ""};
     }
 
     updateField = (name,value) => {
@@ -21,7 +21,7 @@ class TicketForm extends React.Component{
     doRequest = (event) => {
         event.preventDefault();
         if (this.form.checkValidity()) {
-            this.props.reqTicket(this.state.serviceID);
+            this.props.reqTicket(this.state.serviceId);
         } else {
             this.form.reportValidity();
         }
@@ -45,10 +45,10 @@ class TicketForm extends React.Component{
         <form onSubmit={this.validateForm} ref={form => this.form = form}>    
         <Row>
         <Col sm={8}>
-        <Form.Control name="serviceID" as="select" defaultValue="" onChange={(ev) => this.updateField(ev.target.name,ev.target.value)}>
+        <Form.Control name="serviceId" as="select" defaultValue="" onChange={(ev) => this.updateField(ev.target.name,ev.target.value)}>
             <option>choose an option..</option>
             {
-                this.props.services.map((service) =>(<ServiceSelectRow key={service.serviceID} service={service}/>))
+                this.props.services.map((service) =>(<ServiceSelectRow key={service.serviceId} service={service}/>))
             }
         </Form.Control>
         </Col>
@@ -74,14 +74,14 @@ class TicketForm extends React.Component{
 }
 
 function ServiceSelectRow(props){
-    return <option value={props.service.serviceID}>{props.service.serviceName}</option>;
+    return <option value={props.service.serviceId}>{props.service.serviceName}</option>;
 }
 
 function DisplayTicket(props){
     if(props.ticket)
         return <Jumbotron>
-            ticketID: {props.ticket.ticketID}<br/>
-            per il servizio di ID: {props.ticket.serviceID}<br/>
+            ticketID: {props.ticket.ticketId}<br/>
+            per il servizio di ID: {props.ticket.serviceId}<br/>
             tempo stimato: {props.ticket.estimatedTime}
         </Jumbotron>;
     else

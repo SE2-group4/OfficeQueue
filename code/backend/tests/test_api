@@ -1,0 +1,516 @@
+{
+	"info": {
+		"_postman_id": "63c4baff-3b6a-481b-8829-7d1a77f99333",
+		"name": "test_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "test_tickets",
+			"item": [
+				{
+					"name": "{{baseUrl}}/tickets",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "946dfdd1-28a5-49e5-a6ae-c329c9d8c8fa",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result1 = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result1:', result1.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "641ceccf-12df-4df7-bd95-0f5fcaf5db20",
+								"exec": [
+									"pm.test(\"Status code of GET /tickets\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /tickets\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.lengthOf(3);\r",
+									"    pm.expect(responseJson[0].ticketId).to.eql(1);\r",
+									"    pm.expect(responseJson[1].ticketId).to.eql(2);\r",
+									"    pm.expect(responseJson[2].ticketId).to.eql(3);\r",
+									"\r",
+									"    pm.expect(responseJson[0].date).to.eql(\"2020-10-20\");\r",
+									"    pm.expect(responseJson[1].date).to.eql(\"2020-10-20\");\r",
+									"    pm.expect(responseJson[2].date).to.eql(\"2020-10-20\");\r",
+									"\r",
+									"    pm.expect(responseJson[0].serviceId).to.eql(1);\r",
+									"    pm.expect(responseJson[1].serviceId).to.eql(2);\r",
+									"    pm.expect(responseJson[2].serviceId).to.eql(3);\r",
+									"\r",
+									"    pm.expect(responseJson[0].estimatedTime).to.eql(12000);\r",
+									"    pm.expect(responseJson[1].estimatedTime).to.eql(48000);\r",
+									"    pm.expect(responseJson[2].estimatedTime).to.eql(92000);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets"
+							]
+						},
+						"description": "Get all tickets from system"
+					},
+					"response": []
+				},
+				{
+					"name": "{{baseUrl}}/tickets/1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f0632113-91ee-4481-987f-203cb9ac65f5",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result1 = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result1:', result1.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "dba1162a-b639-4d42-9ff8-6f90627ce0da",
+								"exec": [
+									"pm.test(\"Status code of GET /tickets/1\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /services\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.all.keys(\"ticketId\", \"date\", \"serviceId\", \"estimatedTime\");\r",
+									"    pm.expect(responseJson[\"ticketId\"]).to.eql(4);\r",
+									"    pm.expect(responseJson[\"date\"]).to.be.a(\"string\")\r",
+									"    pm.expect(responseJson[\"serviceId\"]).to.eql(1);\r",
+									"    pm.expect(responseJson[\"estimatedTime\"]).to.be.null;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"1"
+							]
+						},
+						"description": "Request a new ticket for service 1"
+					},
+					"response": []
+				},
+				{
+					"name": "{{baseUrl}}/tickets/4",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6ce6f55-6290-41ea-965a-30fe9ec6bf8e",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result1 = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result1:', result1.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b41c21da-a673-495c-8672-4bf48dac1520",
+								"exec": [
+									"pm.test(\"Status code of GET /tickets/1\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /services\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.all.keys(\"from\", \"msg\")\r",
+									"    pm.expect(responseJson[\"msg\"].toLowerCase()).to.eql(\"The service requested (4) does not exists\".toLowerCase());\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								"4"
+							]
+						},
+						"description": "Request a ticket for a non-existing service"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "test_services",
+			"item": [
+				{
+					"name": "{{baseUrl}}/services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3711d293-ccc4-4a33-bbe6-3a5134949029",
+								"exec": [
+									"pm.test(\"Status code of GET /services\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /services\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.lengthOf(3);\r",
+									"    pm.expect(responseJson[0].serviceName.toLowerCase()).to.eql(\"bollettini\");\r",
+									"    pm.expect(responseJson[1].serviceName.toLowerCase()).to.eql(\"spedizioni\");\r",
+									"    pm.expect(responseJson[2].serviceName.toLowerCase()).to.eql(\"raccomandate\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6d097ae8-400c-4bd6-ac73-75472912e62c",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result:', result.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"services"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{baseUrl}}/services",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "35b68749-a29d-4dc3-a67a-70d9c9f27b01",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result:', result.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c16c994f-526c-49f7-a573-f36d4225748b",
+								"exec": [
+									"pm.test(\"Status code of POST /services\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /services\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.all.keys(\"serviceId\", \"serviceName\", \"serviceTime\");\r",
+									"    pm.expect(responseJson[\"serviceId\"]).gt(0);\r",
+									"    pm.expect(responseJson[\"serviceName\"]).to.eql(\"foo\");\r",
+									"    pm.expect(responseJson[\"serviceTime\"]).to.eql(4000);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"serviceName\": \"foo\", \"serviceTime\": 4000}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"services"
+							]
+						},
+						"description": "Request to add a new service to the system"
+					},
+					"response": []
+				},
+				{
+					"name": "{{baseUrl}}/services/1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a6cfc5e8-0f00-4ba6-8ef9-ac510c2e34c7",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result:', result.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "39e70306-3bc0-43cf-b0d8-149df61199e4",
+								"exec": [
+									"pm.test(\"Status code of POST /services\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of /services\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.all.keys(\"serviceId\", \"serviceName\", \"serviceTime\");\r",
+									"    pm.expect(responseJson[\"serviceId\"]).to.eql(1);\r",
+									"    pm.expect(responseJson[\"serviceName\"]).to.eql(\"foo\");\r",
+									"    pm.expect(responseJson[\"serviceTime\"]).to.eql(4000);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"serviceName\": \"foo\", \"serviceTime\": 4000}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"services",
+								"1"
+							]
+						},
+						"description": "Update service 1"
+					},
+					"response": []
+				},
+				{
+					"name": "{{baseUrl}}/services/4",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "207572f6-5233-443b-ab50-da702f4ac401",
+								"exec": [
+									"function sendRequest(req) {\r",
+									"    return new Promise((resolve, reject) => {\r",
+									"        pm.sendRequest(req, (err, res) => {\r",
+									"            if (err) {\r",
+									"                return reject(err);\r",
+									"            }\r",
+									"            return resolve(res);\r",
+									"        })\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"(async function main() {\r",
+									"    const result = await sendRequest('http://localhost:3001/test');\r",
+									"    console.log('result:', result.code);\r",
+									"})();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbf1351b-701e-4f2d-80a2-405ee338e271",
+								"exec": [
+									"pm.test(\"Status code of PUT /services/4\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body of PUT /services/4\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson).to.have.all.keys(\"from\", \"msg\");\r",
+									"    pm.expect(responseJson[\"msg\"]).to.eql(\"You are trying to update a service that does not exists: serviceId = 4, serviceName = foo, serviceTime = 4\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"serviceName\": \"foo\", \"serviceTime\": 4000}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services/4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"services",
+								"4"
+							]
+						},
+						"description": "Update a non existing service"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
