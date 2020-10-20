@@ -19,7 +19,7 @@ class App extends React.Component{
   };
 
   loadServices(){
-    API.getServicesT() //versione di test
+    API.getServices() 
     .then((res) => {
       this.setState({services: res})
     })
@@ -64,7 +64,7 @@ class App extends React.Component{
     //to_do
   }
   editService = (id,name,time) =>{
-    API.editServiceT(id,name,time)
+    API.editService(id,name,time)
     .then(this.loadServices())
     .catch(
       (errorObj)=>{
@@ -73,7 +73,7 @@ class App extends React.Component{
     )
   }
   removeService = (id) =>{
-    API.removeServiceT(id)
+    API.removeService(id)
     .then(this.loadServices())
     .catch(
       (errorObj)=>{
@@ -81,7 +81,7 @@ class App extends React.Component{
       })
   }
   addService = (name,time) =>{
-    API.addServiceT(name,time)
+    API.addService(name,time)
     .then(this.loadServices())
     .catch(
       (errorObj)=>{
@@ -97,9 +97,17 @@ class App extends React.Component{
       })
   }
   addAssociation = (counterId,serviceId) =>{
-    console.log(counterId);
-    console.log(serviceId);
-    API.addAssociationT(counterId,serviceId)
+    let counter;
+    let service;
+    for (let i =0;i<this.state.services.length;i++)
+      if(this.state.services[i].serviceId==serviceId)
+        service=this.state.services[i];
+    for (let i =0;i<this.state.servicesCounters.length;i++)
+      if(this.state.counters[i].counterId===counterId)
+        counter=this.state.counters[i];
+    console.log(counter);
+    console.log(service);
+    API.addAssociation(counter,service)
     .then(this.loadServicesCounters())
     .catch(
       (errorObj)=>{
