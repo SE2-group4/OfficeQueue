@@ -181,7 +181,7 @@ exports.deleteCounterService = function (counter, service) {
                 return;
             }
 
-            resolve(this.changes); 
+            resolve(this.lastID); 
         });
     });
 }
