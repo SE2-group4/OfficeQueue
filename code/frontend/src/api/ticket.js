@@ -1,5 +1,5 @@
 class Ticket{
-    constructor(ticketId,date,serviceID,estimatedTime){
+    constructor(ticketId,date,serviceId,estimatedTime){
         this.ticketId=ticketId;
         this.date=date;
         this.serviceId=serviceId;

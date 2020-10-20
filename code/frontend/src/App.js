@@ -106,6 +106,7 @@ class App extends React.Component{
   }
   render(){
     return <Router>
+      <AppTitle/>
       <Switch>
       <Route path="/admin" render={()=>{
           return <AdminConfigurationPage services={this.state.services} counters={this.state.counters} servicesCounters={this.state.servicesCounters} 
@@ -115,7 +116,6 @@ class App extends React.Component{
         </Route>
         <Route path='/' render={(props) => {
           return <>
-          <AppTitle/>
           <TicketForm services={this.state.services} ticket={this.state.ticket} reqTicket={this.reqTicket}/>
           </>;
         }}> 
