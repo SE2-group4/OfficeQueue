@@ -9,18 +9,23 @@
 
 const moment = require('moment');
 const sqlite = require('sqlite3');
-const dbpath = './testing.db'; // relative reference for testing
+// const dbpath = './testing.db'; // relative reference for testing
 // const dbpath = './office_queue.db';
+let db = null;
+let dbPath = null;
+/*
 let db = new sqlite.Database(dbpath, (err) => {
     if (err) throw err;
 });
+*/
 
 const Service = require('./service.js');
 const Counter = require('./counter.js');
 const Ticket = require('./ticket.js');
 
 exports.init = function({dbpath}) {
-    db = new sqlite.Database(dbpath, (err) => {
+    dbPath = dbpath;
+    db = new sqlite.Database(dbPath, (err) => {
         if (err) throw err;
     });
 }
@@ -103,7 +108,7 @@ exports.updateService = function (service) {
                 return;
             }
 
-            resolve(this.lastID);
+            resolve(this.changes);
         })
     });
 }
@@ -122,7 +127,7 @@ exports.deleteService = function (service) {
                 return;
             }
 
-            resolve(this.lastID);
+            resolve(this.changes);
         })
     });
 }
@@ -135,7 +140,7 @@ exports.deleteService = function (service) {
 exports.addTicket = function (ticket) {
     return new Promise((resolve, reject) => {
         const sql = "INSERT INTO Ticket(ticketId, date, serviceId, estimatedTime) VALUES (?, DATE(?), ?, ?)";
-        db.run(sql, [ticket.ticketId, moment(ticket.date).format("YYYY-MM-DD"), ticket.serviceId, ticket.estimatedTime], function(err) {
+        db.run(sql, [ticket.ticketId, moment(ticket.date).toISOString(), ticket.serviceId, ticket.estimatedTime], function(err) {
             if(err) {
                 reject(err);
                 return;
@@ -181,7 +186,7 @@ exports.deleteCounterService = function (counter, service) {
                 return;
             }
 
-            resolve(this.lastID); 
+            resolve(this.changes);
         });
     });
 }
@@ -193,8 +198,8 @@ exports.deleteCounterService = function (counter, service) {
  */
 exports.getLastTicketIdByDay = function (date) {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT MAX(ticketId) AS ticketId FROM Ticket WHERE date = DATE(?)";
-        db.get(sql, [(moment(date).format("YYYY-MM-DD"))], (err, row) => {
+        const sql = "SELECT MAX(ticketId) AS ticketId FROM Ticket WHERE DATE(date) = DATE(?)";
+        db.get(sql, [(moment(date)).toISOString()], (err, row) => {
             if(err || !row || !row.ticketId) {
                 resolve(0);
                 return;
