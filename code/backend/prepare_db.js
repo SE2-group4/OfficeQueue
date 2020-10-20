@@ -39,20 +39,19 @@ function prepare(cb, flag) {
             }
         });
         db.run('COMMIT;');
-    });
 
-    // Close the DB connection
-    db.close((err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        if(flag) console.log("The testing DB is ready, enjoy! :)");
-
-        if(cb) cb();
+        // Close the DB connection
+        db.close((err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            if(flag) console.log("The testing DB is ready, enjoy! :)");
+    
+            if(cb) cb();
+        });
     });
 }
 
-prepare();
 module.exports.prepare = prepare;
 
 exports.setup = function(dbpath) {
