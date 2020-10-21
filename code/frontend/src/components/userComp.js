@@ -54,7 +54,7 @@ class TicketForm extends React.Component{
         </Col>
         <Col sm={4}>
         <Button variant="secondary" size="sm" onClick={this.doRequest}>
-            Richiedi ticket</Button>
+            Send ticket request</Button>
         </Col>
         </Row>
         </form>
