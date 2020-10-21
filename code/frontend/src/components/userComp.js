@@ -40,7 +40,7 @@ class TicketForm extends React.Component{
         <Container fluid>
         <Jumbotron>
         <Row>
-        <h2>Servizi disponibili:</h2>
+        <h2>Available services:</h2>
         </Row>
         <form onSubmit={this.validateForm} ref={form => this.form = form}>    
         <Row>
@@ -80,9 +80,9 @@ function ServiceSelectRow(props){
 function DisplayTicket(props){
     if(props.ticket)
         return <Jumbotron>
-            ticketID: {props.ticket.ticketId}<br/>
-            per il servizio di ID: {props.ticket.serviceId}<br/>
-            tempo stimato: {props.ticket.estimatedTime}
+            ticketId: {props.ticket.ticketId}<br/>
+            for serviceId: {props.ticket.serviceId}<br/>
+            estimated time: {props.ticket.estimatedTime}
         </Jumbotron>;
     else
         return <></>;    
