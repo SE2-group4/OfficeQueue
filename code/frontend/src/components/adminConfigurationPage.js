@@ -105,13 +105,15 @@ class AdminConfigurationPage extends React.Component {
  function Sidebar(props){
      return (
          <Container fluid>
-             <Button onClick={()=>props.setServicesView()}>Services</Button>
+             <Jumbotron>
+             <Button variant="dark" onClick={()=>props.setServicesView()}>Services</Button>
              <br></br>
              <br></br>
-             <Button onClick={()=>props.setCountersView()}>Counters</Button>
+             <Button variant="dark" onClick={()=>props.setCountersView()}>Counters</Button>
              <br></br>
              <br></br>
-             <Button onClick={()=>props.setServicesCountersView()}>Services - Counters</Button>
+             <Button variant="dark" onClick={()=>props.setServicesCountersView()}>Services - Counters</Button>
+             </Jumbotron>
          </Container>
      )
  }
@@ -131,7 +133,7 @@ class AdminConfigurationPage extends React.Component {
                     {props.services.map((service) => <ContentItem key={service.serviceId} service={service} edit={props.edit} remove={props.remove}/>)}
                 </tbody>
             </Table>
-            <Button onClick={()=>props.add()}>Add a new service!</Button>
+            <Button variant="success" onClick={()=>props.add()}>Add a new service!</Button>
             </>
      );
      if(props.counters)
@@ -161,7 +163,7 @@ class AdminConfigurationPage extends React.Component {
                     {props.servicesCounters.map((service) => <ContentItem key={service.serviceId} serviceCounter={service} remove={props.remove}/>)}
                 </tbody>
             </Table>
-            <Button onClick={()=>props.add()}>Add a new association!</Button>
+            <Button variant="success" onClick={()=>props.add()}>Add a new association!</Button>
             </>
         );
  }
@@ -172,8 +174,8 @@ class AdminConfigurationPage extends React.Component {
             <td>{props.service.serviceId}</td>
             <td>{props.service.serviceName}</td>
             <td>{props.service.serviceTime}</td>
-            <td><Button onClick={()=>props.remove(props.service)}>{trash}</Button></td>
-            <td><Button onClick={()=>props.edit(props.service)}>{edit}</Button></td>
+            <td><Button variant="danger" onClick={()=>props.remove(props.service)}>{trash}</Button></td>
+            <td><Button variant="info" onClick={()=>props.edit(props.service)}>{edit}</Button></td>
         </tr>        
      )
      if(props.counter)
@@ -188,7 +190,7 @@ class AdminConfigurationPage extends React.Component {
         <tr>
             <td>{props.serviceCounter.counterId}</td>
             <td>{props.serviceCounter.serviceId}</td>
-            <td><Button onClick={()=>props.remove(props.serviceCounter.counterId,props.serviceCounter.serviceId)}>{trash}</Button></td>
+            <td><Button variant="danger" onClick={()=>props.remove(props.serviceCounter.counterId,props.serviceCounter.serviceId)}>{trash}</Button></td>
         </tr>     
      );
  }
@@ -265,7 +267,7 @@ class AdminConfigurationPage extends React.Component {
                         </>
                         }
                         <Button variant="secondary" onClick={() => this.props.handleClose()}>Close</Button>
-                        <Button variant="primary" type="submit">Save changes</Button>
+                        <Button variant="success" type="submit">Save changes</Button>
                      </Form>
                  </Modal.Body>
 
