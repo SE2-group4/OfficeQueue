@@ -319,8 +319,8 @@ app.get('/api', (req, res) => res.json(APIRoutes))
 
 app.get('/test', async (req, res) => {
     try { 
-        const dppath = "./testing.db"
-        const ris = await test.setup(dbpath);
+        const path = "./testing.db"
+        const ris = await test.setup(path);
         console.log(ris)
         try {
             lastTicketId = await dao.getLastTicketIdByDay(new Date());
@@ -373,7 +373,7 @@ const init = async () => {
 
 function printConfig() {
     console.log("System parameters:");
-    console.log("Last ticket id", lastTicketId)
+    console.log("Last ticket id of the day", lastTicketId)
     console.log("Available Services:")
     console.log(availableServices)
     console.log("Current database path:", dbpath)
