@@ -8,7 +8,7 @@ let services= [{serviceId:'s1',serviceName:'servizio1',serviceTime:'10'},
                 {serviceId:'s2',serviceName:'servizio2',serviceTime:'15'},
                 {serviceId:'s3',serviceName:'servizio3',serviceTime:'20'}];
 let servicesCounters = [{counterId : "c1",serviceId : "s2"},{counterId : "c2",serviceId: "s1"}];
-let counters = [{counterId : "c1"},{counterId : "c2"}];
+let counters = [{counterId : 1},{counterId : 2}];
 
 async function getServicesT(){
     return services;

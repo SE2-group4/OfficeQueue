@@ -76,6 +76,27 @@ exports.getTickets = function () {
 }
 
 /**
+ * get all counters
+ * @returns {Array} list of counters
+ */
+exports.getCounters = function () {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM Counter"
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                const counters = [];
+                rows.forEach(row => {
+                    counters.push(new Counter(row.counterId));
+                });
+                resolve(counters);
+            }
+        });
+    });
+}
+/**
  * insert a new service into DB
  * @param {Service} service
  * @returns {int} lastId

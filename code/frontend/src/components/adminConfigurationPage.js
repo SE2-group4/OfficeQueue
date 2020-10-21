@@ -57,8 +57,6 @@ class AdminConfigurationPage extends React.Component {
         this.props.removeAssociation(counterId,serviceId);
     }
     addAssociationSubmit = (counterId, serviceId) => {
-        console.log(counterId);
-        console.log(serviceId);
         this.props.addAssociation(counterId,serviceId);
         this.handleClose();
     }

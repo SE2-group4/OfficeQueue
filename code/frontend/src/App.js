@@ -31,7 +31,7 @@ class App extends React.Component{
   }
 
   loadCounters(){
-    APITest.getCountersT() //versione di test
+    API.getCounters() 
     .then((res) => {
       this.setState({counters: res})
     })
@@ -42,7 +42,7 @@ class App extends React.Component{
   }
 
   loadServicesCounters(){
-    APITest.getServicesCountersT() //versione di test
+    API.getServicesCounters() 
     .then((res) => {
       this.setState({servicesCounters: res})
     })
@@ -96,7 +96,19 @@ class App extends React.Component{
   }
 
   removeAssociation = (counterId, serviceId) =>{
-    APITest.removeAssociationT(counterId,serviceId)
+    console.log(counterId);
+    console.log(serviceId);
+    let counter;
+    let service;
+    for (let i =0;i<this.state.services.length;i++)
+      if(this.state.services[i].serviceId==serviceId)
+        service=this.state.services[i];
+    for (let i =0;i<this.state.counters.length;i++)
+      if(this.state.counters[i].counterId===counterId)
+        counter=this.state.counters[i];
+    console.log(counter);
+    console.log(service);
+    API.removeAssociation(counter,service)
     .then(this.loadServicesCounters())
     .catch(
       (errorObj)=>{
@@ -110,8 +122,8 @@ class App extends React.Component{
     for (let i =0;i<this.state.services.length;i++)
       if(this.state.services[i].serviceId==serviceId)
         service=this.state.services[i];
-    for (let i =0;i<this.state.servicesCounters.length;i++)
-      if(this.state.counters[i].counterId===counterId)
+    for (let i =0;i<this.state.counters.length;i++)
+      if(this.state.counters[i].counterId==counterId)
         counter=this.state.counters[i];
     console.log(counter);
     console.log(service);

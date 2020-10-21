@@ -127,6 +127,24 @@ app.get('/api/tickets', async (req, res) => {
         console.log(err);
     }
 });
+ 
+app.get('/api/counterservices', (req, res) => {
+    dao.getCounterServices()
+        .then(services => res.status(200).json(services))
+        .catch(err => {
+            console.log(err, "GET /api/counterservices");
+            res.status(503).json(ErrorMsgDb)
+        });
+});
+
+app.get('/api/counters', (req, res) => {
+    dao.getCounters()
+        .then(counters => res.status(200).json(counters))
+        .catch(err => {
+            console.log(err, "GET /api/counters");
+            res.status(503).json(ErrorMsgDb)
+        });
+});
 /* Request to add a new service to the system 
  * @param Service in json. Example {"serviceName": "foo", "serviceTime": 400}
  * @returns status: 201 for normal execution, 400 for undefined fields and for a serviceName already present in the current available services, and 503 for db error
@@ -210,7 +228,7 @@ app.delete('/api/services/:serviceId', (req, res) => {
     const serviceId = parseInt(req.params.serviceId)
     const service = new Service(serviceId, null, null)
 
-    dao.deleteService(service)
+    dao.deleteService(service) 
         .then((ret) => {
             if(ret === 0) {
                 const errMsg = createErrorMsg(`server delete /api/services/:${service.serviceId}`, `service (id == ${service.serviceId}) does not exists`);
