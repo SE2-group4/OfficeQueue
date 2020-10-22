@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "1bf05eec-9811-4228-98f2-e2904ba32108",
-		"name": "counterService",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"_postman_id": "5aef5733-3d93-4a2a-a4c2-0fac3fdd5ffb",
+		"name": "test_api2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -11,7 +11,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "7a41a116-d748-4bc3-8f7d-0eead7602297",
+						"id": "05e19b3b-9e24-4be8-b9f4-6a4347fa51d6",
 						"exec": [
 							"function sendRequest(req) {\r",
 							"    return new Promise((resolve, reject) => {\r",
@@ -35,18 +35,15 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6da186b7-a915-40fe-8317-0a0841d2a779",
+						"id": "8e9673ff-ffa8-4f0f-98bc-0cabfd69defb",
 						"exec": [
-							"pm.test(\"Status code of POST /Counterservices\", function () {\r",
+							"pm.test(\"Status code of POST /counterservices\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Response body of /services\", function () {\r",
-							"    const responseJson = pm.response.json();\r",
-							"    pm.expect(responseJson).to.have.all.keys(\"serviceId\", \"serviceName\", \"serviceTime\",);\r",
-							"    pm.expect(responseJson[\"serviceId\"]).to.eql(5);\r",
-							"    pm.expect(responseJson[\"serviceName\"]).to.eql(\"foo\");\r",
-							"    pm.expect(responseJson[\"serviceTime\"]).to.eql(4000);\r",
+							"pm.test(\"Response body of POST /counterservices\", function () {\r",
+							"    const responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.eql(\"service: 5 - counter: 5 successfully added\");\r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -58,14 +55,25 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"service\": {\"serviceId\": 5, \"serviceName\": \"foo\", \"serviceTime\": 4000}, \"counter\": {\"counterId\": 6}}",
+					"raw": "{\"service\": {\"serviceId\": 5, \"serviceName\": \"foo\", \"serviceTime\": 4000}, \"counter\": {\"counterId\": 5}}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/counterservices"
+				"url": {
+					"raw": "http://localhost:3001/api/counterservices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"counterservices"
+					]
+				}
 			},
 			"response": []
 		},
@@ -75,7 +83,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "757d7579-e16e-444f-8885-4d5fdfd55b74",
+						"id": "526fad11-d960-4ffc-b6a2-58a925759c11",
 						"exec": [
 							"function sendRequest(req) {\r",
 							"    return new Promise((resolve, reject) => {\r",
@@ -99,15 +107,14 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "80ba8ec1-d2e6-4e96-a9a2-7b188b2f4329",
+						"id": "3cea4f71-c751-4662-9ce1-9b0f60ff74cb",
 						"exec": [
 							"pm.test(\"Status code of delete/counterService\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"pm.test(\"Response body of delete /counterServices\", function () {\r",
-							"    var jsonData = pm.response.json(\"serviceId\",\"counterId\");\r",
-							"    pm.expect(jsonData.value).to.eql(1);\r",
-							"     pm.expect(jsonData.value).to.eql(2);\r",
+							"    const responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.eql(\"service: 1 - counter: 1 was successfully deleted\");\r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -126,7 +133,18 @@
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/counterservices",
+				"url": {
+					"raw": "http://localhost:3001/api/counterservices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3001",
+					"path": [
+						"api",
+						"counterservices"
+					]
+				},
 				"description": "delete"
 			},
 			"response": []
@@ -137,7 +155,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "87b6c29c-8013-4418-bf4e-563d654a4e31",
+						"id": "258f18d9-07df-4ef8-962b-ebf46d8b7fa4",
 						"exec": [
 							"function sendRequest(req) {\r",
 							"    return new Promise((resolve, reject) => {\r",
@@ -161,17 +179,15 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "354fd845-3151-4f4e-9ece-61ece84dda6d",
+						"id": "56d62b01-3dfe-4028-9866-27b86c0dd269",
 						"exec": [
-							"pm.test(\"Status code of Delete /services\", function () {\r",
+							"pm.test(\"Status code of DELETE /services\", function () {\r",
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Response body of /services\", function () {\r",
-							"    const responseJson = pm.response.json();\r",
-							"    pm.expect(responseJson).to.have.all.keys(\"serviceId\");\r",
-							"    pm.expect(responseJson[\"serviceId\"]).gt(0);\r",
-							"    \r",
+							"pm.test(\"Response body of DELETE /services\", function () {\r",
+							"    const responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.eql(\"The service 2 was successfully deleted\"); \r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -183,7 +199,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " {\"serviceId\": 5, \"serviceName\": \"foo\", \"serviceTime\": 4000}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -191,7 +207,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/api/services/:serviceId",
+					"raw": "http://localhost:3001/api/services/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -200,13 +216,7 @@
 					"path": [
 						"api",
 						"services",
-						":serviceId"
-					],
-					"variable": [
-						{
-							"key": "serviceId",
-							"value": ""
-						}
+						"2"
 					]
 				}
 			},
